@@ -45,7 +45,7 @@ describe("tmdbFetch", () => {
   it("lança TmdbError com status quando a resposta não é ok", async () => {
     fetchMock.mockResolvedValue(new Response("{}", { status: 401 }));
 
-    const error = await tmdbFetch("/movie/popular").catch((e) => e);
+    const error = await tmdbFetch<never>("/movie/popular").catch((e: TmdbError) => e);
 
     expect(error).toBeInstanceOf(TmdbError);
     expect(error.status).toBe(401);
@@ -54,7 +54,7 @@ describe("tmdbFetch", () => {
   it("lança TmdbError(500) quando TMDB_TOKEN não existe, sem chamar fetch", async () => {
     vi.stubEnv("TMDB_TOKEN", "");
 
-    const error = await tmdbFetch("/movie/popular").catch((e) => e);
+    const error = await tmdbFetch<never>("/movie/popular").catch((e: TmdbError) => e);
 
     expect(error).toBeInstanceOf(TmdbError);
     expect(error.status).toBe(500);
@@ -64,7 +64,7 @@ describe("tmdbFetch", () => {
   it("lança TmdbError(503) quando fetch rejeita (rede)", async () => {
     fetchMock.mockRejectedValue(new TypeError("fetch failed"));
 
-    const error = await tmdbFetch("/movie/popular").catch((e) => e);
+    const error = await tmdbFetch<never>("/movie/popular").catch((e: TmdbError) => e);
 
     expect(error).toBeInstanceOf(TmdbError);
     expect(error.status).toBe(503);
