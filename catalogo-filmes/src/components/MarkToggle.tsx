@@ -6,7 +6,8 @@ import { useTransition, type ComponentType } from "react";
 import { BookmarkIcon, CheckIcon } from "@/components/Icons";
 import { useMarks } from "@/components/MarksProvider";
 import { toggleMark } from "@/lib/marks/actions";
-import { nextStatus, type MarkSnapshot, type MarkStatus } from "@/lib/marks/rules";
+import type { MarkSnapshot, MarkStatus } from "@/lib/marks/rules";
+import { runToggle } from "@/lib/marks/toggle-flow";
 
 type Props = { movie: MarkSnapshot; variant: "card" | "detail" };
 
@@ -30,18 +31,14 @@ export function MarkToggle({ movie, variant }: Props) {
     `/entrar?${new URLSearchParams({ next: here, marcar: `${movie.movieId}:${status}` })}`;
 
   const onClick = (status: MarkStatus) => {
-    const previous = current;
-    marks.setStatus(movie.movieId, nextStatus(previous, status));
-    startTransition(async () => {
-      const result = await toggleMark(movie, status, previous);
-      if ("error" in result) {
-        marks.setStatus(movie.movieId, previous);
-        if (result.error === "login") router.push(loginHref(status));
-        else marks.showError();
-      } else {
-        marks.setStatus(movie.movieId, result.status);
-      }
-    });
+    startTransition(() =>
+      runToggle(movie, status, current, {
+        toggle: toggleMark,
+        setStatus: marks.setStatus,
+        onLogin: (clicked) => router.push(loginHref(clicked)),
+        onError: marks.showError,
+      }),
+    );
   };
 
   if (variant === "detail") {

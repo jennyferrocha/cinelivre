@@ -12,6 +12,11 @@ describe("safeNext", () => {
     for (const bad of [undefined, "", "//evil.com", "https://evil.com", String.raw`/\evil.com`, "evil", "javascript:alert(1)", " /x"])
       expect(safeNext(bad)).toBe("/");
   });
+
+  it("caracteres invisíveis não abrem brecha para outro site", () => {
+    for (const bad of ["/\t/evil.com", "/\n/evil.com", "/\r/evil.com", "/ /evil.com", "/\u0000/evil.com"])
+      expect(safeNext(bad)).toBe("/");
+  });
 });
 
 describe("authErrorMessage", () => {

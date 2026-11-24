@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { supabaseConfig } from "@/lib/supabase/config";
+import { fetchWithTimeout } from "@/lib/supabase/fetch";
 
 /**
  * Roda antes de cada página: renova a sessão do Supabase (o "crachá" de login,
@@ -12,6 +13,7 @@ export async function proxy(request: NextRequest) {
 
   let response = NextResponse.next({ request });
   const supabase = createServerClient(config.url, config.key, {
+    global: { fetch: fetchWithTimeout() },
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll: (toSet, headers) => {

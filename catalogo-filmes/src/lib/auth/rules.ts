@@ -7,6 +7,14 @@
 export function safeNext(next: string | string[] | undefined): string {
   const value = Array.isArray(next) ? next[0] : next;
   if (!value || !value.startsWith("/") || value.startsWith("//") || value.startsWith("/\\")) return "/";
+  // Navegadores descartam tabs/quebras de linha ao montar o endereço ("/\t/site.com" vira "//site.com").
+  if (/[\u0000- \u007f\\]/.test(value)) return "/";
+  try {
+    // Última conferência: o endereço resolvido continua no próprio app.
+    if (new URL(value, "http://cinelivre.local").origin !== "http://cinelivre.local") return "/";
+  } catch {
+    return "/";
+  }
   return value;
 }
 

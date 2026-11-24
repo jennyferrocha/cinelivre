@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getCurrentUser } from "@/lib/auth/session";
+import { getSessionState } from "@/lib/auth/session";
 import { nextStatus, type MarkSnapshot, type MarkStatus } from "@/lib/marks/rules";
 import { deleteMark, saveMark } from "@/lib/marks/store";
 
@@ -18,7 +18,8 @@ export async function toggleMark(
 ): Promise<ToggleResult> {
   if (!Number.isInteger(movie.movieId) || movie.movieId <= 0) return { error: "falhou" };
   if (clicked !== "quero" && clicked !== "assisti") return { error: "falhou" };
-  const user = await getCurrentUser();
+  const { user, unavailable } = await getSessionState();
+  if (unavailable) return { error: "falhou" }; // Supabase fora do ar: não é caso de pedir login
   if (!user) return { error: "login" };
 
   const status = nextStatus(current, clicked);

@@ -1,9 +1,13 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-const getCurrentUser = vi.fn();
+const getSessionState = vi.fn();
 const saveMark = vi.fn();
 const deleteMark = vi.fn();
-vi.mock("@/lib/auth/session", () => ({ getCurrentUser }));
+vi.mock("@/lib/auth/session", () => ({ getSessionState }));
+const getCurrentUser = {
+  mockResolvedValue: (user: unknown) => getSessionState.mockResolvedValue({ user, unavailable: false }),
+  mockReset: () => getSessionState.mockReset(),
+};
 vi.mock("@/lib/marks/store", () => ({ saveMark, deleteMark }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
@@ -40,6 +44,11 @@ describe("toggleMark", () => {
     getCurrentUser.mockResolvedValue({ id: "u1", email: "a@b.c" });
     saveMark.mockRejectedValue(new Error("rede"));
     expect(await toggleMark(movie, "assisti", "quero")).toEqual({ error: "falhou" });
+  });
+
+  it("Supabase fora do ar: 'falhou' (não manda a pessoa logada para o login)", async () => {
+    getSessionState.mockResolvedValue({ user: null, unavailable: true });
+    expect(await toggleMark(movie, "quero", null)).toEqual({ error: "falhou" });
   });
 
   it("id de filme inválido nem chega ao banco", async () => {
