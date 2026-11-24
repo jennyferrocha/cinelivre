@@ -30,7 +30,7 @@ export function MovieCard({ movie, className = "" }: { movie: MovieCardData; cla
           </span>
         )}
         {rating && (
-          <span className="absolute top-1.5 left-1.5 flex items-center gap-1 rounded-md bg-black/70 px-1.5 py-0.5 text-[11px] font-semibold text-foreground backdrop-blur-sm">
+          <span className="absolute top-1.5 left-1.5 flex items-center gap-1 rounded-md bg-black/70 px-1.5 py-0.5 text-[11px] font-semibold text-accent backdrop-blur-sm">
             <StarIcon className="size-3 text-accent" />
             <span className="sr-only">Nota </span>
             {rating}

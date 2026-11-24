@@ -32,7 +32,7 @@ export function Header() {
         </form>
         <Link
           href="/streamings"
-          className="flex items-center gap-2 rounded-full border border-foreground/20 px-3 py-3 sm:px-3.5 sm:py-2 font-medium hover:border-foreground/40 hover:bg-foreground/10"
+          className="flex items-center gap-2 rounded-full border border-accent/40 px-3 py-3 font-medium text-accent hover:border-accent hover:bg-accent/10 sm:px-3.5 sm:py-2"
         >
           <SlidersIcon />
           <span className="max-sm:sr-only">Meus streamings</span>

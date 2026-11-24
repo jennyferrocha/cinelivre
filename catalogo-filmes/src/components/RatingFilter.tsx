@@ -21,7 +21,7 @@ export function RatingFilter({ active }: { active: number | undefined }) {
             className={`rounded-full px-3.5 py-1.5 text-sm font-semibold transition-colors ${
               isActive
                 ? "bg-accent text-background"
-                : "border border-foreground/20 text-foreground/90 hover:border-foreground/40 hover:bg-foreground/10"
+                : "border border-foreground/30 text-foreground hover:border-foreground/60 hover:bg-foreground/10"
             }`}
           >
             {o.value ? <span aria-hidden>★ </span> : null}

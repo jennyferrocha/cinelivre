@@ -1,6 +1,6 @@
 # CineLivre — Contas e listas (etapa 2) — Design
 
-Data: 2026-11-24 · Status: rascunho para aprovação (com revisão de quem constrói incorporada) · Continua: `2026-11-24-catalogo-filmes-design.md`
+Data: 2026-11-24 · Status: aprovado pela autora em 2026-11-24 · Continua: `2026-11-24-catalogo-filmes-design.md`
 
 ## 1. Intenção
 
