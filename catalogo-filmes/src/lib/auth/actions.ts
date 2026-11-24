@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { applyPendingMark } from "@/lib/auth/pending";
 import { authErrorMessage, parsePendingMark, safeNext } from "@/lib/auth/rules";
+import { syncSelectionOnLogin } from "@/lib/settings/sync";
 import { createSupabaseServer } from "@/lib/supabase/server";
 
 /** `email` volta para o formulário não apagar o que a pessoa digitou quando dá erro. */
@@ -37,6 +38,7 @@ export async function signIn(_prev: AuthState, form: FormData): Promise<AuthStat
   try {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password: senha });
     if (error) return fail(authErrorMessage(error));
+    await syncSelectionOnLogin(data.user.id);
     await applyPendingMark(data.user.id, pending);
   } catch {
     return fail(authErrorMessage({}));
@@ -58,6 +60,7 @@ export async function signUp(_prev: AuthState, form: FormData): Promise<AuthStat
     if (error) return fail(authErrorMessage(error));
     // Se a confirmação de e-mail estiver ligada no painel, não vem sessão.
     if (!data.session || !data.user) return fail("Conta criada. Confirme pelo link enviado ao seu e-mail e depois entre.");
+    await syncSelectionOnLogin(data.user.id);
     await applyPendingMark(data.user.id, pending);
   } catch {
     return fail(authErrorMessage({}));

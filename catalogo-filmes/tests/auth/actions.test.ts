@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 const createSupabaseServer = vi.fn();
 vi.mock("@/lib/supabase/server", () => ({ createSupabaseServer }));
 vi.mock("@/lib/auth/pending", () => ({ applyPendingMark: vi.fn() }));
+vi.mock("@/lib/settings/sync", () => ({ syncSelectionOnLogin: vi.fn() }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("next/navigation", () => ({
   redirect: vi.fn((to: string) => {

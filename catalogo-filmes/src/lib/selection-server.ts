@@ -1,12 +1,26 @@
 import "server-only";
 import { cookies } from "next/headers";
+import { getCurrentUser } from "@/lib/auth/session";
 import { getServiceGroups } from "@/lib/providers/service";
 import { parseSelection, SELECTION_COOKIE, type Selection } from "@/lib/selection";
+import { getAccountSelection } from "@/lib/settings/store";
 
-/** Lê a escolha de streamings do cookie (no servidor). */
+/**
+ * A escolha de streamings da pessoa. Logada e com escolha na conta: vale a da conta
+ * (a mesma em qualquer aparelho). Senão, a do cookie deste aparelho.
+ * Lê cookies: chamar dentro de um <Suspense>.
+ */
 export async function getSelection(): Promise<Selection | null> {
-  const raw = (await cookies()).get(SELECTION_COOKIE)?.value;
-  if (!raw) return null;
-  const groups = await getServiceGroups();
-  return parseSelection(raw, groups.map((g) => g.key));
+  const [raw, groups, user] = await Promise.all([
+    cookies().then((store) => store.get(SELECTION_COOKIE)?.value),
+    getServiceGroups(),
+    getCurrentUser(),
+  ]);
+  const validKeys = groups.map((g) => g.key);
+  if (user) {
+    const account = await getAccountSelection(user.id);
+    const valid = account && parseSelection(JSON.stringify(account), validKeys);
+    if (valid) return valid;
+  }
+  return parseSelection(raw, validKeys);
 }

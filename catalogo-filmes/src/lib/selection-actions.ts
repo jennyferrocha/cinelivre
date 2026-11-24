@@ -2,8 +2,10 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth/session";
 import { getServiceGroups } from "@/lib/providers/service";
 import { SELECTION_COOKIE, selectionFromForm, serializeSelection } from "@/lib/selection";
+import { saveAccountSelection } from "@/lib/settings/store";
 
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
@@ -24,5 +26,14 @@ export async function saveSelection(
     sameSite: "lax",
     path: "/",
   });
+  // Logada: a escolha também vai para a conta (vale em qualquer aparelho).
+  const user = await getCurrentUser();
+  if (user) {
+    try {
+      await saveAccountSelection(user.id, selection);
+    } catch {
+      return { error: "Não foi possível salvar na sua conta. Tente de novo." };
+    }
+  }
   redirect("/");
 }

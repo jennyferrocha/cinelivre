@@ -1,5 +1,6 @@
 import "server-only";
 import { connection } from "next/server";
+import { cache } from "react";
 import { createSupabaseServer } from "@/lib/supabase/server";
 
 export type CurrentUser = { id: string; email: string };
@@ -8,8 +9,9 @@ export type CurrentUser = { id: string; email: string };
  * Quem está logado agora, conferido no Supabase (não só pelo cookie).
  * Qualquer problema (sem configuração, sem sessão, Supabase fora do ar) = ninguém logado.
  * Lê cookies: quem chama precisa estar dentro de um <Suspense>.
+ * `cache`: várias partes da mesma página perguntam, mas o Supabase é consultado uma vez só.
  */
-export async function getCurrentUser(): Promise<CurrentUser | null> {
+export const getCurrentUser = cache(async function getCurrentUser(): Promise<CurrentUser | null> {
   // A sessão muda a cada pedido (e o Supabase confere a validade com a hora atual).
   await connection();
   try {
@@ -21,4 +23,4 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
   } catch {
     return null;
   }
-}
+});
