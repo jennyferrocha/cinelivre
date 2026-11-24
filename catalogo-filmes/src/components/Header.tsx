@@ -9,19 +9,33 @@ export function Header() {
         CineLivre
       </Link>
       <nav className="flex items-center gap-1 text-sm sm:gap-2">
-        <Link
-          href="/busca"
-          aria-label="Buscar filme"
-          className="grid size-10 place-items-center rounded-full text-foreground/90 hover:bg-foreground/10"
+        <form
+          action="/busca"
+          method="get"
+          role="search"
+          className="flex h-10 items-center rounded-full border border-foreground/20 bg-background/40 backdrop-blur-sm focus-within:border-accent hover:border-foreground/40"
         >
-          <SearchIcon />
-        </Link>
+          <input
+            type="search"
+            name="q"
+            placeholder="Buscar filme"
+            aria-label="Buscar filme"
+            className="w-28 min-w-0 bg-transparent pl-4 text-sm outline-none placeholder:text-foreground/70 min-[400px]:w-36 sm:w-52 [&::-webkit-search-cancel-button]:hidden"
+          />
+          <button
+            type="submit"
+            aria-label="Buscar"
+            className="grid size-10 shrink-0 place-items-center rounded-full text-foreground/90 hover:text-accent"
+          >
+            <SearchIcon />
+          </button>
+        </form>
         <Link
           href="/streamings"
-          className="flex items-center gap-2 rounded-full border border-foreground/20 px-3.5 py-2 font-medium hover:border-foreground/40 hover:bg-foreground/10"
+          className="flex items-center gap-2 rounded-full border border-foreground/20 px-3 py-3 sm:px-3.5 sm:py-2 font-medium hover:border-foreground/40 hover:bg-foreground/10"
         >
           <SlidersIcon />
-          <span>Meus streamings</span>
+          <span className="max-sm:sr-only">Meus streamings</span>
         </Link>
       </nav>
     </HeaderShell>
