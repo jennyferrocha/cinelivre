@@ -1,0 +1,5 @@
+# Guarda todos os arquivos de texto com quebra de linha LF (igual em Windows, Mac e Linux).
+* text=auto eol=lf
+*.ico binary
+*.png binary
+*.jpg binary
