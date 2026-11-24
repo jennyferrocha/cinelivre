@@ -9,6 +9,8 @@ import type { MovieLogo } from "@/lib/movies/logo";
 type Props = {
   movie: MovieCard;
   genre: string | null;
+  /** "2h05", ou null quando o TMDB não informa. */
+  runtime: string | null;
   logo: MovieLogo | null;
   /** Posição no "Em alta" (1 = mais popular), quando o filme veio de lá. */
   rank: number | null;
@@ -17,7 +19,7 @@ type Props = {
 const rise = (i: number) => ({ "--i": i }) as CSSProperties;
 
 /** Filme em destaque no topo da tela inicial: foto grande, arte do título e onde assistir. */
-export function Hero({ movie, genre, logo, rank }: Props) {
+export function Hero({ movie, genre, runtime, logo, rank }: Props) {
   return (
     <section className="relative isolate flex min-h-[82svh] items-end overflow-hidden sm:min-h-[92svh]">
       {/* Foto: assenta devagar e se dissolve na sala no pé da tela */}
@@ -76,6 +78,7 @@ export function Hero({ movie, genre, logo, rank }: Props) {
           )}
           {movie.year && <span className="text-foreground/85">{movie.year}</span>}
           {genre && <span className="text-foreground/85">{genre}</span>}
+          {runtime && <span className="text-foreground/85">{runtime}</span>}
           {movie.services.slice(0, 3).map((s) => (
             <span
               key={s.key}

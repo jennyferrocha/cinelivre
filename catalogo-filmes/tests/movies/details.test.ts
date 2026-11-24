@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import fixture from "../fixtures/movie-details.json";
-import { brCertification, formatRuntime, getMovieDetails, pickTrailer, withEnglishOverview } from "@/lib/movies/details";
+import { brCertification, formatRuntime, getMovieDetails, getMovieRuntime, pickTrailer, withEnglishOverview } from "@/lib/movies/details";
 import type { ServiceGroup } from "@/lib/providers/grouping";
 
 const groups: ServiceGroup[] = [
@@ -119,6 +119,19 @@ describe("getMovieDetails (com TMDB simulado)", () => {
     const card = { id: 1, overview: "Em português", title: "X" } as Parameters<typeof withEnglishOverview>[0];
     expect(await withEnglishOverview(card)).toBe(card);
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("duração do filme do destaque, formatada", async () => {
+    fetchMock.mockResolvedValue(json({ ...fixture, runtime: 125 }));
+    expect(await getMovieRuntime(460465)).toBe("2h05");
+    expect(fetchMock.mock.calls[0][0]).toContain("/movie/460465?");
+  });
+
+  it("sem duração no TMDB ou com erro: null (o destaque aparece sem ela)", async () => {
+    fetchMock.mockResolvedValueOnce(json({ ...fixture, runtime: 0 }));
+    expect(await getMovieRuntime(1)).toBeNull();
+    fetchMock.mockResolvedValueOnce(json({}, 500));
+    expect(await getMovieRuntime(1)).toBeNull();
   });
 
   it("filme que não existe (404) devolve null", async () => {

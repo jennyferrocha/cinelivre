@@ -71,6 +71,16 @@ async function englishOverview(id: number): Promise<string> {
   return english.overview?.trim() ?? "";
 }
 
+/** Duração do filme do destaque ("2h05"). A lista do TMDB não traz; erro ou sem dado = null. */
+export async function getMovieRuntime(id: number): Promise<string | null> {
+  try {
+    const data = await tmdbFetch<{ runtime: number | null }>(`/movie/${id}`, {}, DETAILS_REVALIDATE);
+    return formatRuntime(data.runtime);
+  } catch {
+    return null;
+  }
+}
+
 /** Para o destaque: sem sinopse em português, usa a em inglês em vez de deixar vazio. */
 export async function withEnglishOverview(card: MovieCard): Promise<MovieCard> {
   if (card.overview.trim()) return card;

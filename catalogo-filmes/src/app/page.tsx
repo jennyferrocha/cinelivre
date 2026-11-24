@@ -13,7 +13,7 @@ import { discoverMovies, HOME_ROWS, pickHero, withMinRating } from "@/lib/movies
 import { loadMarks } from "@/lib/marks/load";
 import { watchedIds } from "@/lib/marks/rules";
 import { parseTab } from "@/lib/marks/tabs";
-import { withEnglishOverview } from "@/lib/movies/details";
+import { getMovieRuntime, withEnglishOverview } from "@/lib/movies/details";
 import { parseRating } from "@/lib/movies/filters";
 import { genreNames, getGenres } from "@/lib/movies/genres";
 import { getMovieLogo } from "@/lib/movies/logo";
@@ -72,7 +72,11 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
     );
   }
 
-  const [heroMovie, logo] = await Promise.all([withEnglishOverview(hero), getMovieLogo(hero.id)]);
+  const [heroMovie, logo, runtime] = await Promise.all([
+    withEnglishOverview(hero),
+    getMovieLogo(hero.id),
+    getMovieRuntime(hero.id),
+  ]);
   const [trending, ...others] = rows;
   const rank = trending.movies.indexOf(hero) + 1 || null;
 
@@ -80,7 +84,13 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
     <MarksProvider enabled={marksState.enabled} loggedIn={marksState.loggedIn} initial={marksState.byId}>
       <div className="relative isolate">
         <AmbientLight src={hero.backdropUrl} />
-        <Hero movie={heroMovie} genre={genreNames(hero.genreIds, genres)[0] ?? null} logo={logo} rank={rank} />
+        <Hero
+          movie={heroMovie}
+          genre={genreNames(hero.genreIds, genres)[0] ?? null}
+          runtime={runtime}
+          logo={logo}
+          rank={rank}
+        />
         <div className="relative z-10 -mt-28 flex flex-col gap-8 sm:-mt-36">
           {!chosen && <AllStreamingsBanner />}
           <RatingFilter active={nota} />
