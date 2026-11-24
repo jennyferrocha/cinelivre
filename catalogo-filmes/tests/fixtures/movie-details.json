@@ -1,0 +1,242 @@
+{
+  "id": 460465,
+  "title": "Mortal Kombat",
+  "overview": "O lutador de MMA Cole Young deve treinar para liberar seu verdadeiro poder para unir-se aos maiores campeões mundiais contra inimigos da Exoterra em uma batalha decisiva pelo universo.",
+  "poster_path": "/w8BVC3qrCWCiTHRz4Rft12dtQF0.jpg",
+  "backdrop_path": "/6ELCZlTA5lGUops70hKdB83WJxH.jpg",
+  "vote_average": 7.015,
+  "release_date": "2021-04-07",
+  "runtime": 110,
+  "genres": [
+    {
+      "id": 28,
+      "name": "Ação"
+    },
+    {
+      "id": 14,
+      "name": "Fantasia"
+    },
+    {
+      "id": 12,
+      "name": "Aventura"
+    }
+  ],
+  "genre_ids": [
+    28,
+    14,
+    12
+  ],
+  "videos": {
+    "results": [
+      {
+        "key": "lyP9xZatMYQ",
+        "site": "YouTube",
+        "type": "Behind the Scenes",
+        "iso_639_1": "en",
+        "official": true,
+        "name": "Fight Koreography"
+      },
+      {
+        "key": "3wISOkX6mXI",
+        "site": "YouTube",
+        "type": "Clip",
+        "iso_639_1": "en",
+        "official": true,
+        "name": "Full Movie Preview"
+      },
+      {
+        "key": "UdOV_WBqovo",
+        "site": "YouTube",
+        "type": "Behind the Scenes",
+        "iso_639_1": "en",
+        "official": true,
+        "name": "Creating the Fight Scenes"
+      },
+      {
+        "key": "xt6BQKxxdCo",
+        "site": "YouTube",
+        "type": "Clip",
+        "iso_639_1": "en",
+        "official": true,
+        "name": "Opening Seven Minutes"
+      },
+      {
+        "key": "4J1PN5HfU4Q",
+        "site": "YouTube",
+        "type": "Behind the Scenes",
+        "iso_639_1": "en",
+        "official": true,
+        "name": "Kombat Evolution"
+      },
+      {
+        "key": "k3StqDN36G0",
+        "site": "YouTube",
+        "type": "Featurette",
+        "iso_639_1": "en",
+        "official": true,
+        "name": "\"Meet the Kast\" Featurette"
+      },
+      {
+        "key": "fkJSoFTA0EM",
+        "site": "YouTube",
+        "type": "Featurette",
+        "iso_639_1": "en",
+        "official": true,
+        "name": "Fan Reactions to the Restricted Trailer"
+      },
+      {
+        "key": "QJHY4ggYCk4",
+        "site": "YouTube",
+        "type": "Trailer",
+        "iso_639_1": "en",
+        "official": false,
+        "name": "MORTAL KOMBAT Trailer (2021)"
+      },
+      {
+        "key": "jBa_aHwCbC4",
+        "site": "YouTube",
+        "type": "Trailer",
+        "iso_639_1": "en",
+        "official": true,
+        "name": "Official Restricted Trailer"
+      },
+      {
+        "key": "cbvbYpGkgjg",
+        "site": "YouTube",
+        "type": "Trailer",
+        "iso_639_1": "pt",
+        "official": true,
+        "name": "Mortal Kombat - Trailer Oficial"
+      }
+    ]
+  },
+  "credits": {
+    "cast": [
+      {
+        "name": "Lewis Tan",
+        "character": "Cole Young",
+        "order": 0
+      },
+      {
+        "name": "Jessica McNamee",
+        "character": "Sonya Blade",
+        "order": 1
+      },
+      {
+        "name": "Mehcad Brooks",
+        "character": "Jax",
+        "order": 2
+      },
+      {
+        "name": "Josh Lawson",
+        "character": "Kano",
+        "order": 3
+      },
+      {
+        "name": "Ludi Lin",
+        "character": "Liu Kang",
+        "order": 4
+      },
+      {
+        "name": "Max Huang",
+        "character": "Kung Lao",
+        "order": 5
+      },
+      {
+        "name": "浅野忠信",
+        "character": "Lord Raiden",
+        "order": 6
+      },
+      {
+        "name": "Chin Han",
+        "character": "Shang Tsung",
+        "order": 7
+      },
+      {
+        "name": "Hiroyuki Sanada",
+        "character": "Hanzo Hasashi / Scorpion",
+        "order": 8
+      },
+      {
+        "name": "Joe Taslim",
+        "character": "Bi-Han / Sub-Zero",
+        "order": 9
+      }
+    ]
+  },
+  "release_dates": {
+    "results": [
+      {
+        "iso_3166_1": "BR",
+        "release_dates": [
+          {
+            "certification": "16",
+            "type": 3
+          },
+          {
+            "certification": "16",
+            "type": 4
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "US",
+        "release_dates": [
+          {
+            "certification": "R",
+            "type": 3
+          },
+          {
+            "certification": "R",
+            "type": 4
+          },
+          {
+            "certification": "R",
+            "type": 4
+          }
+        ]
+      }
+    ]
+  },
+  "watch/providers": {
+    "results": {
+      "BR": {
+        "link": "https://www.themoviedb.org/movie/460465-mortal-kombat/watch?locale=BR",
+        "flatrate": [
+          {
+            "logo_path": "/skypuy7SXuugIQeYg0IglmzoKaS.png",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 10
+          },
+          {
+            "logo_path": "/olzQMHt2SX7iNy8WDMR299hVFcL.png",
+            "provider_id": 484,
+            "provider_name": "Claro tv+",
+            "display_priority": 22
+          },
+          {
+            "logo_path": "/64fLWeSyZ1KQZhIdvTdy4QHeWty.png",
+            "provider_id": 1825,
+            "provider_name": "HBO Max Amazon Channel",
+            "display_priority": 49
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/qdEGArH3lKfFnAtYXMkSYk5wxuG.png",
+            "provider_id": 2,
+            "provider_name": "Apple TV Store",
+            "display_priority": 11
+          },
+          {
+            "logo_path": "/jn6TLbtaTZntTRX9UYucHJvpQx1.png",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 15
+          }
+        ]
+      }
+    }
+  }
+}

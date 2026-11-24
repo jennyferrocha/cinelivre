@@ -55,7 +55,7 @@ export async function tmdbFetch<T>(
   return (await response.json()) as T;
 }
 
-export type ImageSize = "w342" | "w500" | "w780" | "w1280" | "original";
+export type ImageSize = "w92" | "w185" | "w342" | "w500" | "w780" | "w1280" | "original";
 
 export function imageUrl(path: string | null, size: ImageSize): string | null {
   return path ? `${IMAGE_BASE_URL}/${size}${path}` : null;

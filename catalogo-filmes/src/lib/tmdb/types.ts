@@ -54,3 +54,19 @@ export type TmdbImagesResponse = {
 };
 
 export type TmdbGenre = { id: number; name: string };
+
+export type TmdbVideo = { key: string; site: string; type: string; iso_639_1: string | null };
+
+export type TmdbReleaseDates = {
+  results: { iso_3166_1: string; release_dates: { certification: string; type: number }[] }[];
+};
+
+/** /movie/{id} com append_to_response=videos,credits,release_dates,watch/providers */
+export type TmdbMovieDetails = Omit<TmdbMovieListItem, "genre_ids"> & {
+  runtime: number | null;
+  genres: TmdbGenre[];
+  videos?: { results: TmdbVideo[] };
+  credits?: { cast: { name: string; character?: string; order?: number }[] };
+  release_dates?: TmdbReleaseDates;
+  "watch/providers"?: TmdbWatchProvidersResponse;
+};
