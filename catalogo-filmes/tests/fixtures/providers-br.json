@@ -1,0 +1,812 @@
+[
+ {
+  "provider_id": 8,
+  "provider_name": "Netflix",
+  "logo_path": "/rK1KljqmbvO9HQa1PBFLILWah72.png",
+  "display_priority": 1,
+  "display_priorities": {
+   "BR": 0
+  }
+ },
+ {
+  "provider_id": 119,
+  "provider_name": "Amazon Prime Video",
+  "logo_path": "/gMZdpavHmxFNnLpMHwVxfqeux2g.png",
+  "display_priority": 2,
+  "display_priorities": {
+   "BR": 3
+  }
+ },
+ {
+  "provider_id": 350,
+  "provider_name": "Apple TV",
+  "logo_path": "/v9SnyvYt0U3KGgBH3Sbh3z4yODe.png",
+  "display_priority": 3,
+  "display_priorities": {
+   "BR": 4
+  }
+ },
+ {
+  "provider_id": 337,
+  "provider_name": "Disney Plus",
+  "logo_path": "/5eZ872CghnHFLB1j8grszbrx0dx.png",
+  "display_priority": 4,
+  "display_priorities": {
+   "BR": 5
+  }
+ },
+ {
+  "provider_id": 2791,
+  "provider_name": "JustWatch TV Beta",
+  "logo_path": "/4VxJTXhTeHGMLPxnXdzE6Dfem5u.png",
+  "display_priority": 5,
+  "display_priorities": {
+   "BR": 6
+  }
+ },
+ {
+  "provider_id": 167,
+  "provider_name": "Claro video",
+  "logo_path": "/zTJg0WVErBkcJv4S9FkQRUyXjnq.png",
+  "display_priority": 11,
+  "display_priorities": {
+   "BR": 7
+  }
+ },
+ {
+  "provider_id": 47,
+  "provider_name": "Looke",
+  "logo_path": "/jsAseYgBGuHRkl0sJs9AAQHHU8P.png",
+  "display_priority": 8,
+  "display_priorities": {
+   "BR": 8
+  }
+ },
+ {
+  "provider_id": 531,
+  "provider_name": "Paramount Plus",
+  "logo_path": "/pkx3klJlwW5JdtaulvDx6hDNtch.png",
+  "display_priority": 7,
+  "display_priorities": {
+   "BR": 9
+  }
+ },
+ {
+  "provider_id": 1899,
+  "provider_name": "HBO Max",
+  "logo_path": "/skypuy7SXuugIQeYg0IglmzoKaS.png",
+  "display_priority": 27,
+  "display_priorities": {
+   "BR": 10
+  }
+ },
+ {
+  "provider_id": 2,
+  "provider_name": "Apple TV Store",
+  "logo_path": "/qdEGArH3lKfFnAtYXMkSYk5wxuG.png",
+  "display_priority": 6,
+  "display_priorities": {
+   "BR": 11
+  }
+ },
+ {
+  "provider_id": 307,
+  "provider_name": "Globoplay",
+  "logo_path": "/9A6Oxd3F7iXm7mds7CxYOBicojs.png",
+  "display_priority": 12,
+  "display_priorities": {
+   "BR": 12
+  }
+ },
+ {
+  "provider_id": 283,
+  "provider_name": "Crunchyroll",
+  "logo_path": "/uFL3c4Cq8M6WoLymlC5Y8bmGytV.png",
+  "display_priority": 12,
+  "display_priorities": {
+   "BR": 13
+  }
+ },
+ {
+  "provider_id": 11,
+  "provider_name": "MUBI",
+  "logo_path": "/k7iSlvgWzZuO4zU5PcBjhABMuia.png",
+  "display_priority": 16,
+  "display_priorities": {
+   "BR": 14
+  }
+ },
+ {
+  "provider_id": 10,
+  "provider_name": "Amazon Video",
+  "logo_path": "/jn6TLbtaTZntTRX9UYucHJvpQx1.png",
+  "display_priority": 36,
+  "display_priorities": {
+   "BR": 15
+  }
+ },
+ {
+  "provider_id": 19,
+  "provider_name": "NetMovies",
+  "logo_path": "/l8qT4DDRBVZWQouiT5OUnkw45m7.png",
+  "display_priority": 16,
+  "display_priorities": {
+   "BR": 16
+  }
+ },
+ {
+  "provider_id": 190,
+  "provider_name": "Curiosity Stream",
+  "logo_path": "/oPrhlrmvdq8QDWVXgHLAZz8B2Of.png",
+  "display_priority": 8,
+  "display_priorities": {
+   "BR": 17
+  }
+ },
+ {
+  "provider_id": 447,
+  "provider_name": "Belas Artes à La Carte",
+  "logo_path": "/azTwwwABsjSV0rSORM5DyKmMPV3.png",
+  "display_priority": 18,
+  "display_priorities": {
+   "BR": 18
+  }
+ },
+ {
+  "provider_id": 473,
+  "provider_name": "Revry",
+  "logo_path": "/emSd1j9jOjNzUA2iTKk8qRSvcjs.png",
+  "display_priority": 123,
+  "display_priorities": {
+   "BR": 19
+  }
+ },
+ {
+  "provider_id": 475,
+  "provider_name": "DOCSVILLE",
+  "logo_path": "/enoyK3NBsSCTpaJJJIR5x28mWHN.png",
+  "display_priority": 10,
+  "display_priorities": {
+   "BR": 20
+  }
+ },
+ {
+  "provider_id": 499,
+  "provider_name": "Oldflix",
+  "logo_path": "/86Ja8MBdaS8Fkjsegy3fQsUgNMu.png",
+  "display_priority": 21,
+  "display_priorities": {
+   "BR": 21
+  }
+ },
+ {
+  "provider_id": 484,
+  "provider_name": "Claro tv+",
+  "logo_path": "/olzQMHt2SX7iNy8WDMR299hVFcL.png",
+  "display_priority": 22,
+  "display_priorities": {
+   "BR": 22
+  }
+ },
+ {
+  "provider_id": 477,
+  "provider_name": "GOSPEL PLAY",
+  "logo_path": "/ue3vrsZiLSLfhncP3vppZVNyLaE.png",
+  "display_priority": 23,
+  "display_priorities": {
+   "BR": 23
+  }
+ },
+ {
+  "provider_id": 544,
+  "provider_name": "Libreflix",
+  "logo_path": "/dxDQ4PeeyuA7u403YwitpcEowOX.png",
+  "display_priority": 24,
+  "display_priorities": {
+   "BR": 24
+  }
+ },
+ {
+  "provider_id": 546,
+  "provider_name": "WOW Presents Plus",
+  "logo_path": "/8pME6TzkiDzMnKZioeoqqvfaNya.png",
+  "display_priority": 11,
+  "display_priorities": {
+   "BR": 25
+  }
+ },
+ {
+  "provider_id": 551,
+  "provider_name": "Magellan TV",
+  "logo_path": "/hyo2pwkoGKt5Erpz9TfgNQbN8uq.png",
+  "display_priority": 12,
+  "display_priorities": {
+   "BR": 26
+  }
+ },
+ {
+  "provider_id": 554,
+  "provider_name": "BroadwayHD",
+  "logo_path": "/aPhfGJf1ilFprLhUvpuBpkpHoO.png",
+  "display_priority": 13,
+  "display_priorities": {
+   "BR": 27
+  }
+ },
+ {
+  "provider_id": 559,
+  "provider_name": "Filmzie",
+  "logo_path": "/6tVbNdx7Yzvi6LThNW5Wo1yov6A.png",
+  "display_priority": 14,
+  "display_priorities": {
+   "BR": 28
+  }
+ },
+ {
+  "provider_id": 562,
+  "provider_name": "MovieSaints",
+  "logo_path": "/kFk4puSITzflhhcH0dUJNId022S.png",
+  "display_priority": 136,
+  "display_priorities": {
+   "BR": 29
+  }
+ },
+ {
+  "provider_id": 444,
+  "provider_name": "Dekkoo",
+  "logo_path": "/pqiY6w53xNELS5Y16pYQYvCxgE.png",
+  "display_priority": 15,
+  "display_priorities": {
+   "BR": 30
+  }
+ },
+ {
+  "provider_id": 567,
+  "provider_name": "True Story",
+  "logo_path": "/4lNWw9zxVHvoxbas6SAO8X6J03f.png",
+  "display_priority": 16,
+  "display_priorities": {
+   "BR": 31
+  }
+ },
+ {
+  "provider_id": 569,
+  "provider_name": "DocAlliance Films",
+  "logo_path": "/dAna3PsNLAzPDJkEKWYzMlj94jF.png",
+  "display_priority": 17,
+  "display_priorities": {
+   "BR": 32
+  }
+ },
+ {
+  "provider_id": 315,
+  "provider_name": "Hoichoi",
+  "logo_path": "/8dgAD4EzQWMsyudVwWCFg19998L.png",
+  "display_priority": 18,
+  "display_priorities": {
+   "BR": 33
+  }
+ },
+ {
+  "provider_id": 300,
+  "provider_name": "Pluto TV",
+  "logo_path": "/fN4czqaMQNLeF6sSSIjGbAWzvwK.png",
+  "display_priority": 19,
+  "display_priorities": {
+   "BR": 34
+  }
+ },
+ {
+  "provider_id": 677,
+  "provider_name": "Eventive",
+  "logo_path": "/3TLkIBBnZQ9KdjIjWU7NdqXincI.png",
+  "display_priority": 7,
+  "display_priorities": {
+   "BR": 35
+  }
+ },
+ {
+  "provider_id": 683,
+  "provider_name": "Looke Amazon Channel",
+  "logo_path": "/AezYndUHveajt0XbYnKlGoHlY9i.png",
+  "display_priority": 62,
+  "display_priorities": {
+   "BR": 36
+  }
+ },
+ {
+  "provider_id": 582,
+  "provider_name": "Paramount+ Amazon Channel",
+  "logo_path": "/bxX0YVOCY7bI85BKRlJAAQ2EjUR.png",
+  "display_priority": 31,
+  "display_priorities": {
+   "BR": 37
+  }
+ },
+ {
+  "provider_id": 608,
+  "provider_name": "Love Nature Amazon Channel",
+  "logo_path": "/nfGvnsjqAOAPChbkdCBKX4c1MOh.png",
+  "display_priority": 53,
+  "display_priorities": {
+   "BR": 38
+  }
+ },
+ {
+  "provider_id": 692,
+  "provider_name": "Cultpix",
+  "logo_path": "/hBR1NB5z52BHMqowq0TgZqMcDBv.png",
+  "display_priority": 8,
+  "display_priorities": {
+   "BR": 39
+  }
+ },
+ {
+  "provider_id": 1771,
+  "provider_name": "Takflix",
+  "logo_path": "/exmycQN7BOW3d2Br5SGAQ1BMqjq.png",
+  "display_priority": 11,
+  "display_priorities": {
+   "BR": 40
+  }
+ },
+ {
+  "provider_id": 309,
+  "provider_name": "Sun Nxt",
+  "logo_path": "/1T9VcLknesOZZen9ZgLfcDdm5Ys.png",
+  "display_priority": 4,
+  "display_priorities": {
+   "BR": 41
+  }
+ },
+ {
+  "provider_id": 1796,
+  "provider_name": "Netflix Standard with Ads",
+  "logo_path": "/eGUwOOIxcazwEBxqJpSN5sWEu6V.png",
+  "display_priority": 154,
+  "display_priorities": {
+   "BR": 42
+  }
+ },
+ {
+  "provider_id": 1860,
+  "provider_name": "Univer Video",
+  "logo_path": "/nFOHylv7fSm5fEyTMBWxSwUwv4u.png",
+  "display_priority": 23,
+  "display_priorities": {
+   "BR": 44
+  }
+ },
+ {
+  "provider_id": 1875,
+  "provider_name": "Runtime",
+  "logo_path": "/erEYCN3EGN4yzcRvix2DunZLxHE.png",
+  "display_priority": 24,
+  "display_priorities": {
+   "BR": 45
+  }
+ },
+ {
+  "provider_id": 1920,
+  "provider_name": "Reserva Imovision",
+  "logo_path": "/tg1l1b1mKDEAtKN6YHvLcjd4qWa.png",
+  "display_priority": 46,
+  "display_priorities": {
+   "BR": 46
+  }
+ },
+ {
+  "provider_id": 1715,
+  "provider_name": "Shahid VIP",
+  "logo_path": "/vmBE15FtFOa5RDcH5LEy5TftBLI.png",
+  "display_priority": 10,
+  "display_priorities": {
+   "BR": 47
+  }
+ },
+ {
+  "provider_id": 1973,
+  "provider_name": "Filmicca",
+  "logo_path": "/esECWHOwoOwhg4eIZqK0Vuk5Pml.png",
+  "display_priority": 48,
+  "display_priorities": {
+   "BR": 48
+  }
+ },
+ {
+  "provider_id": 1825,
+  "provider_name": "HBO Max Amazon Channel",
+  "logo_path": "/64fLWeSyZ1KQZhIdvTdy4QHeWty.png",
+  "display_priority": 15,
+  "display_priorities": {
+   "BR": 49
+  }
+ },
+ {
+  "provider_id": 538,
+  "provider_name": "Plex",
+  "logo_path": "/blAEhvx3XX8sV0fFVFk88FFjubs.png",
+  "display_priority": 13,
+  "display_priorities": {
+   "BR": 50
+  }
+ },
+ {
+  "provider_id": 2106,
+  "provider_name": "Adrenalina Pura Amazon channel",
+  "logo_path": "/32EpjQJMkjRsfW7XccIV0RnmXcj.png",
+  "display_priority": 41,
+  "display_priorities": {
+   "BR": 51
+  }
+ },
+ {
+  "provider_id": 2107,
+  "provider_name": "Adrenalina Pura Apple TV channel",
+  "logo_path": "/nca3l6Ud12JcaEAViA7G7JCplBR.png",
+  "display_priority": 49,
+  "display_priorities": {
+   "BR": 52
+  }
+ },
+ {
+  "provider_id": 2142,
+  "provider_name": "MGM+ Apple TV Channel",
+  "logo_path": "/oeic4RyNDK988h5sZctewo6uRwO.png",
+  "display_priority": 50,
+  "display_priorities": {
+   "BR": 53
+  }
+ },
+ {
+  "provider_id": 2141,
+  "provider_name": "MGM Plus Amazon Channel",
+  "logo_path": "/gk7O3l9qHttE9F3hgDNnhbhlOs7.png",
+  "display_priority": 41,
+  "display_priorities": {
+   "BR": 54
+  }
+ },
+ {
+  "provider_id": 2156,
+  "provider_name": "Telecine Amazon Channel",
+  "logo_path": "/jRpdu5KkWx8ZvPCmBY5c4YHhWuK.png",
+  "display_priority": 55,
+  "display_priorities": {
+   "BR": 55
+  }
+ },
+ {
+  "provider_id": 2157,
+  "provider_name": "Reserva Imovision Amazon Channel",
+  "logo_path": "/c0sG3OmJrwYnUeAISP4IxlQBbSE.png",
+  "display_priority": 56,
+  "display_priorities": {
+   "BR": 56
+  }
+ },
+ {
+  "provider_id": 2158,
+  "provider_name": "Stingray Amazon Channel",
+  "logo_path": "/2a5cCOAHejuIlkgzeOH1uAviq4O.png",
+  "display_priority": 53,
+  "display_priorities": {
+   "BR": 57
+  }
+ },
+ {
+  "provider_id": 2159,
+  "provider_name": "CurtaOn Amazon Channel",
+  "logo_path": "/ru18KO33seAsaRXMwT9ttUispRP.png",
+  "display_priority": 58,
+  "display_priorities": {
+   "BR": 58
+  }
+ },
+ {
+  "provider_id": 201,
+  "provider_name": "MUBI Amazon Channel",
+  "logo_path": "/w1hl8HszsPf5aAGT0mVY0O6LYP4.png",
+  "display_priority": 90,
+  "display_priorities": {
+   "BR": 60
+  }
+ },
+ {
+  "provider_id": 1968,
+  "provider_name": "Crunchyroll Amazon Channel",
+  "logo_path": "/qHLLmKo7udRgiSnIASVTwP2IxfJ.png",
+  "display_priority": 27,
+  "display_priorities": {
+   "BR": 69
+  }
+ },
+ {
+  "provider_id": 2303,
+  "provider_name": "Paramount Plus Premium",
+  "logo_path": "/4N4BMd0Mm0kHAmF7RZgL5lW3cwc.png",
+  "display_priority": 19,
+  "display_priorities": {
+   "BR": 70
+  }
+ },
+ {
+  "provider_id": 2356,
+  "provider_name": "Filmelier Plus Amazon Channel",
+  "logo_path": "/qsa5pNRHmZReAhr4CFBQoaPh253.png",
+  "display_priority": 65,
+  "display_priorities": {
+   "BR": 71
+  }
+ },
+ {
+  "provider_id": 2243,
+  "provider_name": "Apple TV Amazon Channel",
+  "logo_path": "/giKLP7saeUA0WykEPRyZUcOVv92.png",
+  "display_priority": 217,
+  "display_priorities": {
+   "BR": 72
+  }
+ },
+ {
+  "provider_id": 2330,
+  "provider_name": "Jolt Film",
+  "logo_path": "/br5xAl9fUmssOElX3ENWvymUtGx.png",
+  "display_priority": 14,
+  "display_priorities": {
+   "BR": 73
+  }
+ },
+ {
+  "provider_id": 2478,
+  "provider_name": "FOUND TV",
+  "logo_path": "/2hAu4MUecOOMTtrlJ3XEqB4dhZr.png",
+  "display_priority": 15,
+  "display_priorities": {
+   "BR": 74
+  }
+ },
+ {
+  "provider_id": 464,
+  "provider_name": "Kocowa",
+  "logo_path": "/tUXhi1QnIhdoPOTFUKKTrshUuiV.png",
+  "display_priority": 330,
+  "display_priorities": {
+   "BR": 75
+  }
+ },
+ {
+  "provider_id": 2488,
+  "provider_name": "Box Brazil Play Amazon Channel",
+  "logo_path": "/wzIxKllkavHTmD1KTecnHTYjpDf.png",
+  "display_priority": 39,
+  "display_priorities": {
+   "BR": 76
+  }
+ },
+ {
+  "provider_id": 2161,
+  "provider_name": "Sony One Amazon Channel",
+  "logo_path": "/COoISLyfBkZ9Vgr5NbjmnxacSb.png",
+  "display_priority": 43,
+  "display_priorities": {
+   "BR": 77
+  }
+ },
+ {
+  "provider_id": 2302,
+  "provider_name": "Mercado Play",
+  "logo_path": "/1jZnP6bS5nNOqwY7GGJuyLhWEYW.png",
+  "display_priority": 34,
+  "display_priorities": {
+   "BR": 78
+  }
+ },
+ {
+  "provider_id": 2100,
+  "provider_name": "Amazon Prime Video with Ads",
+  "logo_path": "/tpwTT1FpWqLLhxUfAuDavIXDDfI.png",
+  "display_priority": 203,
+  "display_priorities": {
+   "BR": 79
+  }
+ },
+ {
+  "provider_id": 2555,
+  "provider_name": "Bloodstream",
+  "logo_path": "/grSWrznc2QaymD5bM0MxMmcdrQl.png",
+  "display_priority": 17,
+  "display_priorities": {
+   "BR": 80
+  }
+ },
+ {
+  "provider_id": 2565,
+  "provider_name": "MovieMe",
+  "logo_path": "/pxmDUtLdaSCek4LUwme4h7wfsC9.png",
+  "display_priority": 18,
+  "display_priorities": {
+   "BR": 81
+  }
+ },
+ {
+  "provider_id": 1889,
+  "provider_name": "Universal+ Amazon Channel",
+  "logo_path": "/j3Q750FwRyIejO5MrNu25Kia57.png",
+  "display_priority": 40,
+  "display_priorities": {
+   "BR": 82
+  }
+ },
+ {
+  "provider_id": 2603,
+  "provider_name": "KableOne",
+  "logo_path": "/tXSfA8awn62PUBbGIGhejrTPwiG.png",
+  "display_priority": 19,
+  "display_priorities": {
+   "BR": 83
+  }
+ },
+ {
+  "provider_id": 2605,
+  "provider_name": "Diamond Films Amazon Channel",
+  "logo_path": "/yt48Eggj90oJZmbUbK3jtuo66Un.png",
+  "display_priority": 80,
+  "display_priorities": {
+   "BR": 84
+  }
+ },
+ {
+  "provider_id": 2607,
+  "provider_name": "Arte Amazon Channel",
+  "logo_path": "/g2hqzXdjzX9PUS2iZtteTGonUxJ.png",
+  "display_priority": 85,
+  "display_priorities": {
+   "BR": 85
+  }
+ },
+ {
+  "provider_id": 2608,
+  "provider_name": "Aquarius Amazon Channel",
+  "logo_path": "/rz4zdCxqtaEHIR2MqSdLuJy0huH.png",
+  "display_priority": 86,
+  "display_priorities": {
+   "BR": 86
+  }
+ },
+ {
+  "provider_id": 2609,
+  "provider_name": "Booh Amazon Channel",
+  "logo_path": "/4DbVjBxOcKdB0v6cofkIgx57uu5.png",
+  "display_priority": 81,
+  "display_priorities": {
+   "BR": 87
+  }
+ },
+ {
+  "provider_id": 2620,
+  "provider_name": "CaixaForum+",
+  "logo_path": "/5BBtkfnbubfLyPXDtscrgQHg1cq.png",
+  "display_priority": 20,
+  "display_priorities": {
+   "BR": 88
+  }
+ },
+ {
+  "provider_id": 2623,
+  "provider_name": "Artiflix",
+  "logo_path": "/hO4tZhtSJ7VrVnJusimkY3MltSx.png",
+  "display_priority": 21,
+  "display_priorities": {
+   "BR": 89
+  }
+ },
+ {
+  "provider_id": 2685,
+  "provider_name": "Artify",
+  "logo_path": "/j6yqJltFxcDIrWB9bBJ2TDQQC8X.png",
+  "display_priority": 22,
+  "display_priorities": {
+   "BR": 90
+  }
+ },
+ {
+  "provider_id": 2358,
+  "provider_name": "Lionsgate+ Amazon Channel",
+  "logo_path": "/1356slxu4QrHOMrEVDKHJXRo5sW.png",
+  "display_priority": 165,
+  "display_priorities": {
+   "BR": 91
+  }
+ },
+ {
+  "provider_id": 2696,
+  "provider_name": "TV Brasil Play",
+  "logo_path": "/ouxfnx2LraW82Svh797NxDt9en0.png",
+  "display_priority": 92,
+  "display_priorities": {
+   "BR": 92
+  }
+ },
+ {
+  "provider_id": 2734,
+  "provider_name": "Koiplay Amazon Channel",
+  "logo_path": "/x8Ez5txo9zsDYELbDx15gAkYKZI.png",
+  "display_priority": 87,
+  "display_priorities": {
+   "BR": 93
+  }
+ },
+ {
+  "provider_id": 2765,
+  "provider_name": "Pijama Films",
+  "logo_path": "/fy6GVs6ZtKluakv0Z5nuLesmTqx.png",
+  "display_priority": 23,
+  "display_priorities": {
+   "BR": 94
+  }
+ },
+ {
+  "provider_id": 2167,
+  "provider_name": "Cindie Amazon Channel",
+  "logo_path": "/hJRq3WKfdlY1gUpKrwAO5iX7n6r.png",
+  "display_priority": 59,
+  "display_priorities": {
+   "BR": 95
+  }
+ },
+ {
+  "provider_id": 2768,
+  "provider_name": "Discovery Kids Amazon Channel",
+  "logo_path": "/hWXWiVf1dV5JbK2DgjMKZ3K8Amc.png",
+  "display_priority": 96,
+  "display_priorities": {
+   "BR": 96
+  }
+ },
+ {
+  "provider_id": 2767,
+  "provider_name": "Doc Canal Brasil Amazon Channel",
+  "logo_path": "/cNmF6oxVlOx73H3kTgis11eQ0pW.png",
+  "display_priority": 97,
+  "display_priorities": {
+   "BR": 97
+  }
+ },
+ {
+  "provider_id": 2774,
+  "provider_name": "Multishow Amazon Channel",
+  "logo_path": "/zg4JTdoXkZBw5YriGHAeRNizSZf.png",
+  "display_priority": 98,
+  "display_priorities": {
+   "BR": 98
+  }
+ },
+ {
+  "provider_id": 2780,
+  "provider_name": "Gloob Amazon Channel",
+  "logo_path": "/bOxBTJrVaEchWWtjJFNuvcirhe1.png",
+  "display_priority": 100,
+  "display_priorities": {
+   "BR": 100
+  }
+ },
+ {
+  "provider_id": 2789,
+  "provider_name": "Lente Curta+",
+  "logo_path": "/cwKEfmBCF5tOT9GqUuMefHCqKUK.png",
+  "display_priority": 102,
+  "display_priorities": {
+   "BR": 102
+  }
+ },
+ {
+  "provider_id": 623,
+  "provider_name": "Tencent Video",
+  "logo_path": "/oxcvMEkpFb1x4I2xQuRH1yxuJoA.png",
+  "display_priority": 382,
+  "display_priorities": {
+   "BR": 103
+  }
+ }
+]
