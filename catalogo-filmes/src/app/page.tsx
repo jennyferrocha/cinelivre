@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { Hero, HeroSkeleton } from "@/components/Hero";
 import { MovieRow, MovieRowSkeleton, RankedRow } from "@/components/MovieRow";
@@ -19,6 +20,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   const selection = await getSelection();
   if (!selection) redirect("/streamings");
 
+  await connection(); // a data de hoje é calculada a cada pedido, não na pré-renderização
   const today = new Date();
   const [groups, genres] = await Promise.all([getServiceGroups(), getGenres()]);
   const rows = await Promise.all(

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { StarIcon } from "@/components/Icons";
 import { formatRating } from "@/lib/movies/filters";
 import { getMovieDetails } from "@/lib/movies/details";
@@ -30,7 +31,32 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: movie ? `${movie.title} · CineLivre` : "Filme não encontrado · CineLivre" };
 }
 
-export default async function MoviePage({ params }: Props) {
+/** Enquanto o filme carrega: o fundo e o pôster em cinza, já no lugar certo. */
+function MovieSkeleton() {
+  return (
+    <main className="-mt-16" aria-busy="true">
+      <div className="h-[52vh] min-h-72 w-full bg-surface sm:h-[62vh]" />
+      <div className="relative z-10 mx-auto -mt-40 flex max-w-5xl flex-col gap-6 px-4 pb-16 sm:-mt-56 sm:flex-row sm:gap-10 sm:px-10">
+        <div className="aspect-[2/3] w-36 shrink-0 animate-pulse rounded-lg bg-surface-2 sm:w-60" />
+        <div className="flex flex-1 flex-col gap-4 sm:pt-28">
+          <div className="h-10 w-2/3 animate-pulse rounded bg-surface-2" />
+          <div className="h-4 w-1/2 animate-pulse rounded bg-surface-2" />
+          <div className="h-20 w-full animate-pulse rounded bg-surface-2" />
+        </div>
+      </div>
+    </main>
+  );
+}
+
+export default function MoviePage({ params }: Props) {
+  return (
+    <Suspense fallback={<MovieSkeleton />}>
+      <MovieContent params={params} />
+    </Suspense>
+  );
+}
+
+async function MovieContent({ params }: Props) {
   const movie = await load((await params).id);
   if (!movie) notFound();
 
