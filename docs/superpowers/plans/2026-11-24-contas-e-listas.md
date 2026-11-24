@@ -225,7 +225,7 @@ expect(parseTab(["assisti"])).toBe("assisti");
 expect(parseTab("xyz")).toBe("para-voce");
 ```
 - [ ] **Step 2:** FAIL → implemente → PASS.
-- [ ] **Step 3:** `HomeTabs` logo abaixo do topo, fora do Suspense (não lê sessão), estilo de abas sublinhadas em amarelo. Na aba de lista, a tela não mostra o destaque nem as fileiras: mostra título, `MarkedList` (servidor, dentro de Suspense) com `MovieGrid` dos `marksToCards`, cujas etiquetas de streaming vêm de `attachServices` com `keepUnavailable: true` (os fora dos streamings mostram "Não está nos seus streamings"). Sem login: "Entre para guardar os filmes que você quer ver" + botão "Entrar" (`/entrar?next=/?aba=...`). Lista vazia: "Você ainda não marcou nenhum filme." + "Toque em 🔖 ou ✓ em qualquer pôster."
+- [ ] **Step 3:** `HomeTabs` logo abaixo do topo, fora do Suspense (não lê sessão), estilo de abas sublinhadas em amarelo. Na aba de lista, a tela não mostra o destaque nem as fileiras: mostra título, `MarkedList` (servidor, dentro de Suspense) com `MovieGrid` dos `marksToCards`, cujas etiquetas de streaming vêm de `attachServices` com `keepUnavailable: true` (os fora dos streamings mostram "Não está nos seus streamings"). Sem login: "Entre para guardar os filmes que você quer ver" + botão "Entrar" (`/entrar?next=/?aba=...`). Lista vazia: "Você ainda não marcou nenhum filme." + "Toque no marcador ou no ✓ de qualquer pôster."
 - [ ] **Step 4: Checkpoint:** marcar três filmes, abrir cada aba, recarregar `/?aba=quero` e ver a aba certa; ver um filme fora dos seus streamings com a etiqueta. Conceito: estado na URL.
 - [ ] **Step 5:** Commit `feat: abas quero assistir e já assisti`.
 

@@ -21,3 +21,13 @@ const MESSAGES: Record<string, string> = {
 export function authErrorMessage(error: { code?: string; message?: string }): string {
   return (error.code && MESSAGES[error.code]) || "Não foi possível entrar agora. Tente de novo.";
 }
+
+export type PendingMark = { movieId: number; status: "quero" | "assisti" };
+
+/** O filme que a pessoa tocou antes de entrar (`?marcar=603:quero`). Inválido = null. */
+export function parsePendingMark(value: string | string[] | undefined): PendingMark | null {
+  const raw = Array.isArray(value) ? value[0] : value;
+  const match = raw?.match(/^([1-9]\d{0,9}):(quero|assisti)$/);
+  if (!match) return null;
+  return { movieId: Number(match[1]), status: match[2] as PendingMark["status"] };
+}

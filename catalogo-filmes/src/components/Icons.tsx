@@ -64,6 +64,22 @@ export function StarIcon({ className = "size-4" }: IconProps) {
   );
 }
 
+export function BookmarkIcon({ className = "size-4" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M6 3h12v18l-6-4-6 4z" />
+    </svg>
+  );
+}
+
+export function CheckIcon({ className = "size-4" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} {...base} strokeWidth={2.5}>
+      <path d="m5 12.5 4.5 4.5L19 7.5" />
+    </svg>
+  );
+}
+
 export function UserIcon({ className = "size-5" }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" className={className} {...base}>

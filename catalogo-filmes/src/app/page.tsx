@@ -4,9 +4,11 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { Hero, HeroSkeleton } from "@/components/Hero";
+import { MarksProvider } from "@/components/MarksProvider";
 import { MovieRow, MovieRowSkeleton, RankedRow } from "@/components/MovieRow";
 import { RatingFilter } from "@/components/RatingFilter";
 import { discoverMovies, HOME_ROWS, pickHero, withMinRating } from "@/lib/movies/discover";
+import { loadMarks } from "@/lib/marks/load";
 import { withEnglishOverview } from "@/lib/movies/details";
 import { parseRating } from "@/lib/movies/filters";
 import { genreNames, getGenres } from "@/lib/movies/genres";
@@ -20,6 +22,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   const nota = parseRating((await searchParams).nota);
   const selection = await getSelection();
   if (!selection) redirect("/streamings");
+  const marksState = await loadMarks();
 
   await connection(); // a data de hoje é calculada a cada pedido, não na pré-renderização
   const today = new Date();
@@ -56,20 +59,22 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   const rank = trending.movies.indexOf(hero) + 1 || null;
 
   return (
-    <div className="relative isolate">
-      <AmbientLight src={hero.backdropUrl} />
-      <Hero movie={heroMovie} genre={genreNames(hero.genreIds, genres)[0] ?? null} logo={logo} rank={rank} />
-      <div className="relative z-10 -mt-28 flex flex-col gap-8 sm:-mt-36">
-        <RatingFilter active={nota} />
-        <RankedRow
-          title={`Top 10 em alta nos seus streamings${nota ? ` · nota ${nota}+` : ""}`}
-          movies={trending.movies}
-        />
-        {others.map((row) => (
-          <MovieRow key={row.id} title={row.title} movies={row.movies} />
-        ))}
+    <MarksProvider enabled={marksState.enabled} loggedIn={marksState.loggedIn} initial={marksState.byId}>
+      <div className="relative isolate">
+        <AmbientLight src={hero.backdropUrl} />
+        <Hero movie={heroMovie} genre={genreNames(hero.genreIds, genres)[0] ?? null} logo={logo} rank={rank} />
+        <div className="relative z-10 -mt-28 flex flex-col gap-8 sm:-mt-36">
+          <RatingFilter active={nota} />
+          <RankedRow
+            title={`Top 10 em alta nos seus streamings${nota ? ` · nota ${nota}+` : ""}`}
+            movies={trending.movies}
+          />
+          {others.map((row) => (
+            <MovieRow key={row.id} title={row.title} movies={row.movies} />
+          ))}
+        </div>
       </div>
-    </div>
+    </MarksProvider>
   );
 }
 

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { SearchIcon } from "@/components/Icons";
+import { MarksProvider } from "@/components/MarksProvider";
 import { MovieGrid } from "@/components/MovieGrid";
 import { MovieRowSkeleton } from "@/components/MovieRow";
+import { loadMarks } from "@/lib/marks/load";
 import { normalizeQuery, searchMovies } from "@/lib/movies/search";
 import { getServiceGroups } from "@/lib/providers/service";
 import { getSelection } from "@/lib/selection-server";
@@ -26,7 +28,10 @@ async function SearchForm({ searchParams }: { searchParams: SearchParams }) {
         aria-label="Nome do filme"
         className="min-w-0 flex-1 rounded-md border border-foreground/20 bg-surface-2 px-4 py-3 text-base outline-none placeholder:text-muted focus:border-accent"
       />
-      <button type="submit" className="flex items-center gap-2 rounded-md bg-accent px-4 font-semibold text-background hover:brightness-110">
+      <button
+        type="submit"
+        className="flex items-center gap-2 rounded-md bg-accent px-4 font-semibold text-background hover:brightness-110"
+      >
         <SearchIcon />
         <span className="max-sm:sr-only">Buscar</span>
       </button>
@@ -39,17 +44,19 @@ async function Results({ searchParams }: { searchParams: SearchParams }) {
   if (!q) return <p className="text-muted">Digite o nome de um filme para buscar.</p>;
 
   const [selection, groups] = await Promise.all([getSelection(), getServiceGroups()]);
-  const movies = await searchMovies(q, selection, groups);
+  const [movies, marksState] = await Promise.all([searchMovies(q, selection, groups), loadMarks()]);
   if (movies.length === 0) {
     return <p className="py-10 text-center text-lg">Nenhum filme encontrado para &ldquo;{q}&rdquo;.</p>;
   }
   return (
-    <section aria-live="polite" className="flex flex-col gap-5">
-      <p className="text-foreground/85">
-        Resultados para <strong className="text-foreground">&ldquo;{q}&rdquo;</strong>
-      </p>
-      <MovieGrid movies={movies} />
-    </section>
+    <MarksProvider enabled={marksState.enabled} loggedIn={marksState.loggedIn} initial={marksState.byId}>
+      <section aria-live="polite" className="flex flex-col gap-5">
+        <p className="text-foreground/85">
+          Resultados para <strong className="text-foreground">&ldquo;{q}&rdquo;</strong>
+        </p>
+        <MovieGrid movies={movies} />
+      </section>
+    </MarksProvider>
   );
 }
 

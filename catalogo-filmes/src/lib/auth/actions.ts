@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { authErrorMessage, safeNext } from "@/lib/auth/rules";
+import { applyPendingMark } from "@/lib/auth/pending";
+import { authErrorMessage, parsePendingMark, safeNext } from "@/lib/auth/rules";
 import { createSupabaseServer } from "@/lib/supabase/server";
 
 /** `email` volta para o formulário não apagar o que a pessoa digitou quando dá erro. */
@@ -15,6 +16,7 @@ function readForm(form: FormData) {
     email: String(form.get("email") ?? "").trim(),
     senha: String(form.get("senha") ?? ""),
     next: safeNext(String(form.get("next") ?? "")),
+    pending: parsePendingMark(String(form.get("marcar") ?? "")),
   };
 }
 
@@ -26,15 +28,16 @@ function validate(email: string, senha: string): string | null {
 
 /** Formulário "Entrar": confere e-mail e senha no Supabase e volta para onde a pessoa estava. */
 export async function signIn(_prev: AuthState, form: FormData): Promise<AuthState> {
-  const { email, senha, next } = readForm(form);
+  const { email, senha, next, pending } = readForm(form);
   const fail = (error: string): AuthState => ({ error, email });
   const invalid = validate(email, senha);
   if (invalid) return fail(invalid);
   const supabase = await createSupabaseServer();
   if (!supabase) return fail(UNAVAILABLE);
   try {
-    const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password: senha });
     if (error) return fail(authErrorMessage(error));
+    await applyPendingMark(data.user.id, pending);
   } catch {
     return fail(authErrorMessage({}));
   }
@@ -44,7 +47,7 @@ export async function signIn(_prev: AuthState, form: FormData): Promise<AuthStat
 
 /** Formulário "Criar conta": sem confirmação de e-mail, a pessoa já sai logada. */
 export async function signUp(_prev: AuthState, form: FormData): Promise<AuthState> {
-  const { email, senha, next } = readForm(form);
+  const { email, senha, next, pending } = readForm(form);
   const fail = (error: string): AuthState => ({ error, email });
   const invalid = validate(email, senha);
   if (invalid) return fail(invalid);
@@ -54,7 +57,8 @@ export async function signUp(_prev: AuthState, form: FormData): Promise<AuthStat
     const { data, error } = await supabase.auth.signUp({ email, password: senha });
     if (error) return fail(authErrorMessage(error));
     // Se a confirmação de e-mail estiver ligada no painel, não vem sessão.
-    if (!data.session) return fail("Conta criada. Confirme pelo link enviado ao seu e-mail e depois entre.");
+    if (!data.session || !data.user) return fail("Conta criada. Confirme pelo link enviado ao seu e-mail e depois entre.");
+    await applyPendingMark(data.user.id, pending);
   } catch {
     return fail(authErrorMessage({}));
   }

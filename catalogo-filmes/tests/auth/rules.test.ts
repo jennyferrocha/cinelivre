@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { authErrorMessage, safeNext } from "@/lib/auth/rules";
+import { authErrorMessage, parsePendingMark, safeNext } from "@/lib/auth/rules";
 
 describe("safeNext", () => {
   it("aceita caminhos do próprio app", () => {
@@ -25,5 +25,17 @@ describe("authErrorMessage", () => {
   it("erro desconhecido vira mensagem genérica", () => {
     expect(authErrorMessage({ code: "algo_novo" })).toBe("Não foi possível entrar agora. Tente de novo.");
     expect(authErrorMessage({})).toBe("Não foi possível entrar agora. Tente de novo.");
+  });
+});
+
+describe("parsePendingMark", () => {
+  it("lê o filme que a pessoa tentou marcar antes de entrar", () => {
+    expect(parsePendingMark("603:quero")).toEqual({ movieId: 603, status: "quero" });
+    expect(parsePendingMark(["603:assisti"])).toEqual({ movieId: 603, status: "assisti" });
+  });
+
+  it("valores inválidos são ignorados", () => {
+    for (const bad of [undefined, "", "abc:quero", "603:outra", "603", "-1:quero", "1.5:quero", "0:quero", "603:quero:x"])
+      expect(parsePendingMark(bad)).toBeNull();
   });
 });
