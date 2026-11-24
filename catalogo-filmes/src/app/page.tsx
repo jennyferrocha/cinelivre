@@ -4,13 +4,18 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Hero, HeroSkeleton } from "@/components/Hero";
 import { MovieRow, MovieRowSkeleton, RankedRow } from "@/components/MovieRow";
-import { discoverMovies, HOME_ROWS, pickHero } from "@/lib/movies/discover";
+import { RatingFilter } from "@/components/RatingFilter";
+import { discoverMovies, HOME_ROWS, pickHero, withMinRating } from "@/lib/movies/discover";
+import { parseRating } from "@/lib/movies/filters";
 import { genreNames, getGenres } from "@/lib/movies/genres";
 import { getMovieLogo } from "@/lib/movies/logo";
 import { getServiceGroups } from "@/lib/providers/service";
 import { getSelection } from "@/lib/selection-server";
 
-async function HomeContent() {
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
+  const nota = parseRating((await searchParams).nota);
   const selection = await getSelection();
   if (!selection) redirect("/streamings");
 
@@ -19,11 +24,19 @@ async function HomeContent() {
   const rows = await Promise.all(
     HOME_ROWS.map(async (row) => ({
       ...row,
-      movies: await discoverMovies(selection, groups, row.filters(today)),
+      movies: await discoverMovies(selection, groups, withMinRating(row.filters(today), nota)),
     })),
   );
 
   const hero = pickHero(rows[0].movies) ?? pickHero(rows.flatMap((r) => r.movies));
+  if (!hero && nota) {
+    return (
+      <div className="flex flex-col items-center gap-5 px-4 pt-40 pb-24 text-center">
+        <p className="text-lg">Nenhum filme com nota {nota}+ nos seus streamings. Tente uma nota menor.</p>
+        <RatingFilter active={nota} />
+      </div>
+    );
+  }
   if (!hero) {
     return (
       <div className="flex flex-col items-center gap-3 px-4 pt-40 pb-24 text-center">
@@ -44,7 +57,11 @@ async function HomeContent() {
       <AmbientLight src={hero.backdropUrl} />
       <Hero movie={hero} genre={genreNames(hero.genreIds, genres)[0] ?? null} logo={logo} rank={rank} />
       <div className="relative z-10 -mt-28 flex flex-col gap-8 sm:-mt-36">
-        <RankedRow title="Top 10 em alta nos seus streamings" movies={trending.movies} />
+        <RatingFilter active={nota} />
+        <RankedRow
+          title={`Top 10 em alta nos seus streamings${nota ? ` · nota ${nota}+` : ""}`}
+          movies={trending.movies}
+        />
         {others.map((row) => (
           <MovieRow key={row.id} title={row.title} movies={row.movies} />
         ))}
@@ -87,11 +104,11 @@ function HomeSkeleton() {
   );
 }
 
-export default function HomePage() {
+export default function HomePage({ searchParams }: { searchParams: SearchParams }) {
   return (
     <main className="-mt-16 flex flex-col">
       <Suspense fallback={<HomeSkeleton />}>
-        <HomeContent />
+        <HomeContent searchParams={searchParams} />
       </Suspense>
     </main>
   );

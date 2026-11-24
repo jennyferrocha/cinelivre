@@ -6,6 +6,7 @@ import {
   HOME_ROWS,
   pickHero,
   toMovieCard,
+  withMinRating,
   type MovieCard,
 } from "@/lib/movies/discover";
 import { FREE_PROVIDER_IDS } from "@/lib/providers/free";
@@ -68,6 +69,30 @@ describe("buildDiscoverParams", () => {
   it("nota mínima sem mínimo de votos usa 50 votos", () => {
     const params = buildDiscoverParams({ services: ["netflix"], includeFree: false }, groups, { ...popular, minRating: 8 }, 1);
     expect(params["vote_count.gte"]).toBe(50);
+  });
+});
+
+describe("withMinRating", () => {
+  const sel = { services: ["netflix"], includeFree: false };
+  const today = new Date("2026-11-24T12:00:00Z");
+  const row = (id: string) => HOME_ROWS.find((r) => r.id === id)!.filters(today);
+
+  it("em alta com nota 7 pede 7+ e 50 votos", () => {
+    const params = buildDiscoverParams(sel, groups, withMinRating(row("em-alta"), 7), 1);
+    expect(params["vote_average.gte"]).toBe(7);
+    expect(params["vote_count.gte"]).toBe(50);
+  });
+
+  it("bem avaliados mantém o mínimo maior de votos", () => {
+    const params = buildDiscoverParams(sel, groups, withMinRating(row("bem-avaliados"), 7), 1);
+    expect(params["vote_average.gte"]).toBe(7);
+    expect(params["vote_count.gte"]).toBe(300);
+  });
+
+  it("sem nota não muda os filtros", () => {
+    const filters = row("em-alta");
+    expect(withMinRating(filters, undefined)).toBe(filters);
+    expect(buildDiscoverParams(sel, groups, withMinRating(filters, undefined), 1)).not.toHaveProperty("vote_average.gte");
   });
 });
 

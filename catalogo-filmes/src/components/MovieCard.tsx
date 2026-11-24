@@ -1,11 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
+import { StarIcon } from "@/components/Icons";
 import type { MovieCard as MovieCardData } from "@/lib/movies/discover";
+import { formatRating } from "@/lib/movies/filters";
 
 /** Pôster com a etiqueta do streaming e, embaixo, título e ano. Leva ao detalhe do filme. */
 export function MovieCard({ movie, className = "" }: { movie: MovieCardData; className?: string }) {
   const first = movie.services[0];
   const label = first ? (first.free ? `${first.name}, grátis` : first.name) : null;
+  const rating = formatRating(movie.rating);
 
   return (
     <Link href={`/filme/${movie.id}`} className={`group block rounded-lg outline-none ${className}`} title={movie.title}>
@@ -24,6 +27,13 @@ export function MovieCard({ movie, className = "" }: { movie: MovieCardData; cla
             className="flex h-full items-center justify-center p-3 text-center font-display text-xl leading-tight font-bold"
           >
             {movie.title}
+          </span>
+        )}
+        {rating && (
+          <span className="absolute top-1.5 left-1.5 flex items-center gap-1 rounded-md bg-black/70 px-1.5 py-0.5 text-[11px] font-semibold text-foreground backdrop-blur-sm">
+            <StarIcon className="size-3 text-accent" />
+            <span className="sr-only">Nota </span>
+            {rating}
           </span>
         )}
         <span className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/80 to-transparent" />

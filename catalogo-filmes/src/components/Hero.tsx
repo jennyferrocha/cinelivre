@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { DiceIcon, InfoIcon, StarIcon } from "@/components/Icons";
 import type { MovieCard } from "@/lib/movies/discover";
+import { formatRating } from "@/lib/movies/filters";
 import type { MovieLogo } from "@/lib/movies/logo";
 
 type Props = {
@@ -66,10 +67,10 @@ export function Hero({ movie, genre, logo, rank }: Props) {
         </h1>
 
         <div className="hero-rise flex flex-wrap items-center gap-x-4 gap-y-2 text-sm" style={rise(2)}>
-          {movie.rating > 0 && (
+          {formatRating(movie.rating) && (
             <span className="flex items-center gap-1 font-semibold text-accent">
               <StarIcon />
-              {movie.rating.toFixed(1).replace(".", ",")}
+              {formatRating(movie.rating)}
             </span>
           )}
           {movie.year && <span className="text-foreground/85">{movie.year}</span>}

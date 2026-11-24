@@ -64,6 +64,11 @@ export function buildDiscoverParams(
   return params;
 }
 
+/** Aplica a nota mínima escolhida pela pessoa, mantendo o mínimo de votos da fileira. */
+export function withMinRating(filters: DiscoverFilters, minRating?: number): DiscoverFilters {
+  return minRating ? { ...filters, minRating } : filters;
+}
+
 function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
