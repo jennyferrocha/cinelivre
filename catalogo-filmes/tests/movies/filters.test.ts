@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatRating, parseFilterParams, parseRating, pickRandom, RATING_OPTIONS } from "@/lib/movies/filters";
+import { formatRating, parseFilterParams, parseRating, pickRandom, RATING_OPTIONS, unavailableLabel } from "@/lib/movies/filters";
 
 describe("parseRating", () => {
   it("aceita as opções 6, 7 e 8", () => {
@@ -65,5 +65,15 @@ describe("pickRandom", () => {
   it("usa o sorteio para escolher", () => {
     expect(pickRandom(["a", "b", "c"], () => 0.99)).toBe("c");
     expect(pickRandom(["a", "b", "c"], () => 0)).toBe("a");
+  });
+});
+
+describe("unavailableLabel", () => {
+  it("quem escolheu streamings: o filme pode estar em outro serviço", () => {
+    expect(unavailableLabel(true)).toBe("Não está nos seus streamings");
+  });
+
+  it("quem não escolheu (o app olhou todos): não está em nenhum", () => {
+    expect(unavailableLabel(false)).toBe("Não está em nenhum streaming");
   });
 });

@@ -28,7 +28,7 @@ async function withServices(marks: Mark[], status: MarkStatus, selection: Select
   const ordered = marksToCards(marks, status); // mais recentes primeiro
   const byId = new Map(marks.map((m) => [m.movieId, m]));
   try {
-    // Mantém todos (keepUnavailable): quem saiu dos streamings aparece com "Não está nos seus streamings".
+    // Mantém todos (keepUnavailable): quem saiu dos streamings aparece com o texto de "fora dos streamings".
     return await attachServices(
       asListItems(ordered.map((c) => byId.get(c.id)!)),
       selection,
@@ -45,11 +45,14 @@ export async function MarkedList({
   status,
   marksState,
   selection,
+  chosen,
   groups,
 }: {
   status: MarkStatus;
   marksState: MarksState;
   selection: Selection | null;
+  /** A pessoa escolheu streamings? (muda o texto dos filmes fora deles) */
+  chosen: boolean;
   groups: ServiceGroup[];
 }) {
   const title = <h1 className="font-display text-2xl font-extrabold sm:text-3xl">{TITLES[status]}</h1>;
@@ -82,7 +85,7 @@ export async function MarkedList({
       <section className="flex flex-col gap-5 px-4 sm:px-10">
         {title}
         {movies.length > 0 ? (
-          <MovieGrid movies={movies} />
+          <MovieGrid movies={movies} chosen={chosen} />
         ) : (
           <div className="flex flex-col gap-1 rounded-lg border border-line bg-surface/70 p-6">
             <p className="text-lg">Você ainda não marcou nenhum filme.</p>

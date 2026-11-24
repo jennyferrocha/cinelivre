@@ -43,7 +43,7 @@ async function Results({ searchParams }: { searchParams: SearchParams }) {
   const q = normalizeQuery((await searchParams).q);
   if (!q) return <p className="text-muted">Digite o nome de um filme para buscar.</p>;
 
-  const [selection, groups] = await Promise.all([getEffectiveSelection().then((e) => e.selection), getServiceGroups()]);
+  const [{ selection, chosen }, groups] = await Promise.all([getEffectiveSelection(), getServiceGroups()]);
   const [movies, marksState] = await Promise.all([searchMovies(q, selection, groups), loadMarks()]);
   if (movies.length === 0) {
     return <p className="py-10 text-center text-lg">Nenhum filme encontrado para &ldquo;{q}&rdquo;.</p>;
@@ -54,7 +54,7 @@ async function Results({ searchParams }: { searchParams: SearchParams }) {
         <p className="text-foreground/85">
           Resultados para <strong className="text-foreground">&ldquo;{q}&rdquo;</strong>
         </p>
-        <MovieGrid movies={movies} />
+        <MovieGrid movies={movies} chosen={chosen} />
       </section>
     </MarksProvider>
   );

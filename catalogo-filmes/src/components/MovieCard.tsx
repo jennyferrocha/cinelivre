@@ -4,13 +4,22 @@ import { StarIcon } from "@/components/Icons";
 import { MarkToggle, WatchedBadge } from "@/components/MarkToggle";
 import { snapshotFromCard } from "@/lib/marks/rules";
 import type { MovieCard as MovieCardData } from "@/lib/movies/discover";
-import { formatRating } from "@/lib/movies/filters";
+import { formatRating, unavailableLabel } from "@/lib/movies/filters";
 
 /**
  * Pôster com a etiqueta do streaming e, embaixo, título e ano. Leva ao detalhe do filme.
  * Os botões de marcar ficam fora do link (botão dentro de link não é permitido), por cima do canto.
  */
-export function MovieCard({ movie, className = "" }: { movie: MovieCardData; className?: string }) {
+export function MovieCard({
+  movie,
+  className = "",
+  chosen = true,
+}: {
+  movie: MovieCardData;
+  className?: string;
+  /** A pessoa escolheu streamings? Muda o texto de "fora dos streamings". */
+  chosen?: boolean;
+}) {
   const first = movie.services[0];
   const label = first ? (first.free ? `${first.name}, grátis` : first.name) : null;
   const rating = formatRating(movie.rating);
@@ -42,7 +51,7 @@ export function MovieCard({ movie, className = "" }: { movie: MovieCardData; cla
               {label}
             </span>
           ) : (
-            <span className="absolute bottom-2 left-2 max-w-[88%] text-[11px] text-muted">Não está nos seus streamings</span>
+            <span className="absolute bottom-2 left-2 max-w-[88%] text-[11px] text-muted">{unavailableLabel(chosen)}</span>
           )}
           <WatchedBadge movieId={movie.id} />
         </div>

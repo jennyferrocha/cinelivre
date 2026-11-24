@@ -60,3 +60,11 @@ export function pickRandom<T>(items: T[], rng: () => number = Math.random): T | 
   if (items.length === 0) return undefined;
   return items[Math.min(items.length - 1, Math.floor(rng() * items.length))];
 }
+
+/**
+ * Texto do pôster de um filme fora dos streamings. Sem escolha da pessoa, o app olhou todos
+ * os serviços, então o filme não está em nenhum; com escolha, pode estar num que ela não assina.
+ */
+export function unavailableLabel(chosen: boolean): string {
+  return chosen ? "Não está nos seus streamings" : "Não está em nenhum streaming";
+}

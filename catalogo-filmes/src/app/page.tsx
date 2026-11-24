@@ -34,7 +34,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
     const [marksState, groups] = await Promise.all([loadMarks(), getServiceGroups()]);
     return (
       <div className="pt-32 pb-8">
-        <MarkedList status={tab} marksState={marksState} selection={selection} groups={groups} />
+        <MarkedList status={tab} marksState={marksState} selection={selection} chosen={chosen} groups={groups} />
       </div>
     );
   }
