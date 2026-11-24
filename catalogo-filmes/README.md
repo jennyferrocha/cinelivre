@@ -60,6 +60,9 @@ Ainda não há "Esqueci minha senha": o e-mail padrão do Supabase só envia par
 - `npm run test:seguranca` (opcional): confere as regras de segurança no seu projeto do Supabase.
   Cria duas contas descartáveis (`teste+rls...@example.com`) e verifica que uma não lê, não altera e
   não cria dados da outra. Depois, se quiser, apague essas contas em **Authentication → Users**.
+- `npm run test:paginas` (opcional): com o app rodando (`npm run dev`), confere que a primeira
+  visita abre direto nos filmes, com a faixa "Mostrando filmes de todos os streamings.". Para testar
+  o site publicado: `SITE_URL=https://seu-site.vercel.app npm run test:paginas`.
 
 ## Onde fica cada coisa
 
