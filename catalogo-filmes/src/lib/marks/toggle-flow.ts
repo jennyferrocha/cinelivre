@@ -10,6 +10,8 @@ export type ToggleDeps = {
   setStatus: (movieId: number, status: MarkStatus | null) => void;
   onLogin: (clicked: MarkStatus) => void;
   onError: () => void;
+  /** Filmes com um toque ainda sendo salvo: novos toques neles são ignorados até terminar. */
+  busy: Set<number>;
 };
 
 export async function runToggle(
@@ -18,21 +20,27 @@ export async function runToggle(
   previous: MarkStatus | null,
   deps: ToggleDeps,
 ): Promise<void> {
-  deps.setStatus(movie.movieId, nextStatus(previous, clicked));
-  let result: ToggleResult;
+  if (deps.busy.has(movie.movieId)) return;
+  deps.busy.add(movie.movieId);
   try {
-    result = await deps.toggle(movie, clicked, previous);
-  } catch {
-    // A chamada nem chegou ao servidor (sem internet, servidor reiniciando...).
-    deps.setStatus(movie.movieId, previous);
-    deps.onError();
-    return;
+    deps.setStatus(movie.movieId, nextStatus(previous, clicked));
+    let result: ToggleResult;
+    try {
+      result = await deps.toggle(movie, clicked, previous);
+    } catch {
+      // A chamada nem chegou ao servidor (sem internet, servidor reiniciando...).
+      deps.setStatus(movie.movieId, previous);
+      deps.onError();
+      return;
+    }
+    if ("error" in result) {
+      deps.setStatus(movie.movieId, previous);
+      if (result.error === "login") deps.onLogin(clicked);
+      else deps.onError();
+      return;
+    }
+    deps.setStatus(movie.movieId, result.status);
+  } finally {
+    deps.busy.delete(movie.movieId);
   }
-  if ("error" in result) {
-    deps.setStatus(movie.movieId, previous);
-    if (result.error === "login") deps.onLogin(clicked);
-    else deps.onError();
-    return;
-  }
-  deps.setStatus(movie.movieId, result.status);
 }

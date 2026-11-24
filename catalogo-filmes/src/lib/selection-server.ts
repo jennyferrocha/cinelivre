@@ -1,16 +1,13 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { getCurrentUser } from "@/lib/auth/session";
+import type { ServiceGroup } from "@/lib/providers/grouping";
 import { getServiceGroups } from "@/lib/providers/service";
 import { allServicesSelection, parseSelection, SELECTION_COOKIE, type Selection } from "@/lib/selection";
 import { getAccountSelection } from "@/lib/settings/store";
 
-/**
- * A escolha de streamings da pessoa. Logada e com escolha na conta: vale a da conta
- * (a mesma em qualquer aparelho). Senão, a do cookie deste aparelho.
- * Lê cookies: chamar dentro de um <Suspense>.
- */
-export async function getSelection(): Promise<Selection | null> {
+/** Escolha real + a lista de streamings (buscada uma vez só por quem precisa das duas). */
+async function readSelection(): Promise<{ selection: Selection | null; groups: ServiceGroup[] }> {
   const [raw, groups, user] = await Promise.all([
     cookies().then((store) => store.get(SELECTION_COOKIE)?.value),
     getServiceGroups(),
@@ -20,9 +17,18 @@ export async function getSelection(): Promise<Selection | null> {
   if (user) {
     const account = await getAccountSelection(user.id);
     const valid = account && parseSelection(JSON.stringify(account), validKeys);
-    if (valid) return valid;
+    if (valid) return { selection: valid, groups };
   }
-  return parseSelection(raw, validKeys);
+  return { selection: parseSelection(raw, validKeys), groups };
+}
+
+/**
+ * A escolha de streamings da pessoa. Logada e com escolha na conta: vale a da conta
+ * (a mesma em qualquer aparelho). Senão, a do cookie deste aparelho.
+ * Lê cookies: chamar dentro de um <Suspense>.
+ */
+export async function getSelection(): Promise<Selection | null> {
+  return (await readSelection()).selection;
 }
 
 /**
@@ -31,7 +37,7 @@ export async function getSelection(): Promise<Selection | null> {
  * A escolha "todos" nunca é gravada.
  */
 export async function getEffectiveSelection(): Promise<{ selection: Selection; chosen: boolean }> {
-  const selection = await getSelection();
+  const { selection, groups } = await readSelection();
   if (selection) return { selection, chosen: true };
-  return { selection: allServicesSelection(await getServiceGroups()), chosen: false };
+  return { selection: allServicesSelection(groups), chosen: false };
 }

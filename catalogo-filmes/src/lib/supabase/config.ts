@@ -24,3 +24,11 @@ export function supabaseConfig(env: Env = defaultEnv()): SupabaseConfig | null {
   }
   return { url, key };
 }
+
+/**
+ * Opções dos cookies de login. `httpOnly`: scripts da página não conseguem lê-los (o app só usa
+ * o Supabase no servidor). `secure` só em produção: em http://localhost o login não funcionaria.
+ */
+export function sessionCookieOptions(nodeEnv: string | undefined = process.env.NODE_ENV) {
+  return { httpOnly: true, secure: nodeEnv === "production", sameSite: "lax" as const, path: "/" };
+}

@@ -58,4 +58,27 @@ describe("toggleMark", () => {
     }
     expect(saveMark).not.toHaveBeenCalled();
   });
+
+  it("dados do filme fora do formato esperado nem chegam ao banco", async () => {
+    getCurrentUser.mockResolvedValue({ id: "u1", email: "a@b.c" });
+    const bad = [
+      { ...movie, title: "" },
+      { ...movie, title: "x".repeat(301) },
+      { ...movie, year: "abcd" },
+      { ...movie, posterPath: "https://site.com/x.jpg" },
+      { ...movie, posterPath: "/" + "a".repeat(200) + ".jpg" },
+      { ...movie, rating: 11 },
+      { ...movie, rating: Number.NaN },
+      { ...movie, title: 123 as unknown as string },
+    ];
+    for (const m of bad) expect(await toggleMark(m, "quero", null)).toEqual({ error: "falhou" });
+    expect(saveMark).not.toHaveBeenCalled();
+  });
+
+  it("filme sem pôster e sem ano é aceito", async () => {
+    getCurrentUser.mockResolvedValue({ id: "u1", email: "a@b.c" });
+    expect(await toggleMark({ ...movie, posterPath: null, year: "", rating: 0 }, "quero", null)).toEqual({
+      status: "quero",
+    });
+  });
 });

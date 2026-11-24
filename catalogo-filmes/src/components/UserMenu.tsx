@@ -1,3 +1,4 @@
+import { AccountMenu } from "@/components/AccountMenu";
 import { UserIcon } from "@/components/Icons";
 import { LoginLink } from "@/components/LoginLink";
 import { signOut } from "@/lib/auth/actions";
@@ -10,13 +11,16 @@ export async function UserMenu() {
   const user = await getCurrentUser();
   if (!user) return <LoginLink />;
   return (
-    <details className="relative">
-      <summary
-        aria-label="Sua conta"
-        className="grid size-10 cursor-pointer list-none place-items-center rounded-full bg-accent text-accent-ink hover:brightness-110 [&::-webkit-details-marker]:hidden"
-      >
-        <UserIcon />
-      </summary>
+    <AccountMenu
+      summary={
+        <summary
+          aria-label="Sua conta"
+          className="grid size-10 cursor-pointer list-none place-items-center rounded-full bg-accent text-accent-ink hover:brightness-110 [&::-webkit-details-marker]:hidden"
+        >
+          <UserIcon />
+        </summary>
+      }
+    >
       <div className="absolute top-12 right-0 z-40 flex w-60 flex-col gap-3 rounded-lg border border-line bg-surface p-4 shadow-xl">
         <p className="truncate text-sm text-muted" title={user.email}>
           {user.email}
@@ -27,6 +31,6 @@ export async function UserMenu() {
           </button>
         </form>
       </div>
-    </details>
+    </AccountMenu>
   );
 }

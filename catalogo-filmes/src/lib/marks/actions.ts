@@ -5,6 +5,24 @@ import { getSessionState } from "@/lib/auth/session";
 import { nextStatus, type MarkSnapshot, type MarkStatus } from "@/lib/marks/rules";
 import { deleteMark, saveMark } from "@/lib/marks/store";
 
+/** Os dados do filme vêm do navegador: só aceita o formato que o app mesmo envia. */
+function validSnapshot(m: MarkSnapshot): boolean {
+  return (
+    Number.isInteger(m.movieId) &&
+    m.movieId > 0 &&
+    typeof m.title === "string" &&
+    m.title.trim().length > 0 &&
+    m.title.length <= 300 &&
+    typeof m.year === "string" &&
+    /^(\d{4})?$/.test(m.year) &&
+    (m.posterPath === null || (typeof m.posterPath === "string" && /^\/[\w.-]{1,120}$/.test(m.posterPath))) &&
+    typeof m.rating === "number" &&
+    Number.isFinite(m.rating) &&
+    m.rating >= 0 &&
+    m.rating <= 10
+  );
+}
+
 export type ToggleResult = { status: MarkStatus | null } | { error: "login" | "falhou" };
 
 /**
@@ -16,7 +34,7 @@ export async function toggleMark(
   clicked: MarkStatus,
   current: MarkStatus | null,
 ): Promise<ToggleResult> {
-  if (!Number.isInteger(movie.movieId) || movie.movieId <= 0) return { error: "falhou" };
+  if (!validSnapshot(movie)) return { error: "falhou" };
   if (clicked !== "quero" && clicked !== "assisti") return { error: "falhou" };
   const { user, unavailable } = await getSessionState();
   if (unavailable) return { error: "falhou" }; // Supabase fora do ar: não é caso de pedir login

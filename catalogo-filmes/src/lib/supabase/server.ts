@@ -2,7 +2,7 @@ import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
-import { supabaseConfig } from "@/lib/supabase/config";
+import { sessionCookieOptions, supabaseConfig } from "@/lib/supabase/config";
 import { fetchWithTimeout } from "@/lib/supabase/fetch";
 
 /**
@@ -15,6 +15,7 @@ export async function createSupabaseServer(): Promise<SupabaseClient | null> {
   const store = await cookies();
   return createServerClient(config.url, config.key, {
     global: { fetch: fetchWithTimeout() },
+    cookieOptions: sessionCookieOptions(),
     cookies: {
       getAll: () => store.getAll(),
       setAll: (toSet) => {

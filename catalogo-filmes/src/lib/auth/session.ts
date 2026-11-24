@@ -8,8 +8,9 @@ export type CurrentUser = { id: string; email: string };
 /** `unavailable`: o Supabase não respondeu (rede, erro 5xx, demora) — diferente de "ninguém logado". */
 export type SessionState = { user: CurrentUser | null; unavailable: boolean };
 
+/** Rede caiu, demorou demais ou o Supabase respondeu 5xx: é "fora do ar", não "deslogada". */
 function isOutage(error: { name?: string; status?: number }): boolean {
-  return error.name === "AuthRetryableFetchError" || !error.status || error.status >= 500;
+  return error.name === "AuthRetryableFetchError" || (error.status ?? 0) >= 500;
 }
 
 /**
@@ -23,13 +24,13 @@ export const getSessionState = cache(async function getSessionState(): Promise<S
   try {
     const supabase = await createSupabaseServer();
     if (!supabase) return { user: null, unavailable: false };
-    const { data, error } = await supabase.auth.getUser();
-    if (error) {
-      if (error.name === "AuthSessionMissingError") return { user: null, unavailable: false };
-      return { user: null, unavailable: isOutage(error) };
-    }
-    if (!data.user) return { user: null, unavailable: false };
-    return { user: { id: data.user.id, email: data.user.email ?? "" }, unavailable: false };
+    // getClaims confere a assinatura do login localmente (sem ir à rede) quando o projeto usa as
+    // chaves de assinatura novas; nas antigas, consulta o Supabase como o getUser.
+    const { data, error } = await supabase.auth.getClaims();
+    if (error) return { user: null, unavailable: isOutage(error) };
+    const claims = data?.claims;
+    if (!claims?.sub) return { user: null, unavailable: false };
+    return { user: { id: claims.sub, email: typeof claims.email === "string" ? claims.email : "" }, unavailable: false };
   } catch {
     return { user: null, unavailable: true };
   }

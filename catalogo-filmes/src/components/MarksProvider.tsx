@@ -8,6 +8,8 @@ type MarksContextValue = {
   statusOf: (movieId: number) => MarkStatus | null;
   setStatus: (movieId: number, status: MarkStatus | null) => void;
   showError: () => void;
+  /** Filmes com um toque ainda sendo salvo (o mesmo filme pode aparecer em vários pôsteres). */
+  busy: Set<number>;
 };
 
 const MarksContext = createContext<MarksContextValue | null>(null);
@@ -34,6 +36,7 @@ export function MarksProvider({
 }) {
   const [marks, setMarks] = useState(initial);
   const [error, setError] = useState(false);
+  const [busy] = useState(() => new Set<number>());
 
   // O Next guarda o estado das páginas já visitadas. Quando o servidor manda marcações
   // diferentes (ex.: depois de entrar na conta), elas passam a valer.
@@ -60,8 +63,8 @@ export function MarksProvider({
   }, []);
 
   const value = useMemo<MarksContextValue>(
-    () => ({ loggedIn, statusOf: (id) => marks[id] ?? null, setStatus, showError: () => setError(true) }),
-    [loggedIn, marks, setStatus],
+    () => ({ loggedIn, statusOf: (id) => marks[id] ?? null, setStatus, showError: () => setError(true), busy }),
+    [loggedIn, marks, setStatus, busy],
   );
 
   if (!enabled) return <>{children}</>;

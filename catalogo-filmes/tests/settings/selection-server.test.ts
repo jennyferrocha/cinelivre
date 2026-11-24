@@ -4,9 +4,8 @@ let cookieValue: string | undefined;
 vi.mock("next/headers", () => ({
   cookies: async () => ({ get: () => (cookieValue ? { value: cookieValue } : undefined) }),
 }));
-vi.mock("@/lib/providers/service", () => ({
-  getServiceGroups: async () => [{ key: "netflix" }, { key: "hbo-max" }],
-}));
+const getServiceGroups = vi.fn(async () => [{ key: "netflix" }, { key: "hbo-max" }]);
+vi.mock("@/lib/providers/service", () => ({ getServiceGroups }));
 const getCurrentUser = vi.fn();
 const getAccountSelection = vi.fn();
 vi.mock("@/lib/auth/session", () => ({ getCurrentUser }));
@@ -64,6 +63,13 @@ describe("getEffectiveSelection", () => {
   it("sem escolha nenhuma: todos os streamings, marcado como não escolhido", async () => {
     getCurrentUser.mockResolvedValue(null);
     expect(await getEffectiveSelection()).toEqual({ selection: all, chosen: false });
+  });
+
+  it("busca a lista de streamings uma vez só", async () => {
+    getCurrentUser.mockResolvedValue(null);
+    getServiceGroups.mockClear();
+    await getEffectiveSelection();
+    expect(getServiceGroups).toHaveBeenCalledTimes(1);
   });
 
   it("cookie corrompido conta como sem escolha", async () => {

@@ -7,7 +7,7 @@ vi.mock("next/server", () => ({ connection: vi.fn(async () => { calls.push("conn
 
 const { getCurrentUser, getSessionState } = await import("@/lib/auth/session");
 
-const clientWith = (getUser: () => unknown) => ({ auth: { getUser: vi.fn(getUser) } });
+const clientWith = (getClaims: () => unknown) => ({ auth: { getClaims: vi.fn(getClaims) } });
 
 describe("getCurrentUser", () => {
   afterEach(() => createSupabaseServer.mockReset());
@@ -18,7 +18,7 @@ describe("getCurrentUser", () => {
   });
 
   it("erro do Supabase vira 'ninguém logado'", async () => {
-    createSupabaseServer.mockResolvedValue(clientWith(async () => ({ data: { user: null }, error: { message: "x" } })));
+    createSupabaseServer.mockResolvedValue(clientWith(async () => ({ data: null, error: { name: "AuthApiError", status: 500, message: "x" } })));
     expect(await getCurrentUser()).toBeNull();
   });
 
@@ -31,7 +31,7 @@ describe("getCurrentUser", () => {
     calls.length = 0;
     createSupabaseServer.mockImplementation(async () => {
       calls.push("supabase");
-      return clientWith(async () => ({ data: { user: null }, error: null }));
+      return clientWith(async () => ({ data: null, error: null }));
     });
     await getCurrentUser();
     expect(calls).toEqual(["connection", "supabase"]);
@@ -39,25 +39,30 @@ describe("getCurrentUser", () => {
 
   it("com sessão válida, devolve id e e-mail", async () => {
     createSupabaseServer.mockResolvedValue(
-      clientWith(async () => ({ data: { user: { id: "u1", email: "a@b.c" } }, error: null })),
+      clientWith(async () => ({ data: { claims: { sub: "u1", email: "a@b.c" } }, error: null })),
     );
     expect(await getCurrentUser()).toEqual({ id: "u1", email: "a@b.c" });
   });
 
   it("sem sessão é 'deslogada', não 'fora do ar'", async () => {
+    createSupabaseServer.mockResolvedValue(clientWith(async () => ({ data: null, error: null })));
+    expect(await getSessionState()).toEqual({ user: null, unavailable: false });
+  });
+
+  it("login inválido ou vencido é 'deslogada'", async () => {
     createSupabaseServer.mockResolvedValue(
-      clientWith(async () => ({ data: { user: null }, error: { name: "AuthSessionMissingError", status: 400 } })),
+      clientWith(async () => ({ data: null, error: { name: "AuthInvalidJwtError", message: "jwt expired" } })),
     );
     expect(await getSessionState()).toEqual({ user: null, unavailable: false });
   });
 
   it("Supabase sem responder (rede ou erro 5xx) é 'fora do ar', não 'deslogada'", async () => {
     createSupabaseServer.mockResolvedValue(
-      clientWith(async () => ({ data: { user: null }, error: { name: "AuthRetryableFetchError", status: 0 } })),
+      clientWith(async () => ({ data: null, error: { name: "AuthRetryableFetchError", status: 0 } })),
     );
     expect(await getSessionState()).toEqual({ user: null, unavailable: true });
     createSupabaseServer.mockResolvedValue(
-      clientWith(async () => ({ data: { user: null }, error: { name: "AuthApiError", status: 503 } })),
+      clientWith(async () => ({ data: null, error: { name: "AuthApiError", status: 503 } })),
     );
     expect(await getSessionState()).toEqual({ user: null, unavailable: true });
     createSupabaseServer.mockResolvedValue(clientWith(async () => { throw new Error("timeout"); }));

@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { supabaseConfig } from "@/lib/supabase/config";
+import { sessionCookieOptions, supabaseConfig } from "@/lib/supabase/config";
 import { fetchWithTimeout } from "@/lib/supabase/fetch";
 
 /**
@@ -14,6 +14,7 @@ export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
   const supabase = createServerClient(config.url, config.key, {
     global: { fetch: fetchWithTimeout() },
+    cookieOptions: sessionCookieOptions(),
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll: (toSet, headers) => {
@@ -26,7 +27,7 @@ export async function proxy(request: NextRequest) {
   });
 
   try {
-    await supabase.auth.getUser();
+    await supabase.auth.getClaims(); // renova a sessão se estiver perto de vencer
   } catch {
     // Supabase fora do ar: segue sem renovar; a página trata como "ninguém logado".
   }

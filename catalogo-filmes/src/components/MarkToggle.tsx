@@ -37,6 +37,7 @@ export function MarkToggle({ movie, variant }: Props) {
         setStatus: marks.setStatus,
         onLogin: (clicked) => router.push(loginHref(clicked)),
         onError: marks.showError,
+        busy: marks.busy,
       }),
     );
   };
@@ -64,10 +65,11 @@ export function MarkToggle({ movie, variant }: Props) {
   }
 
   return (
-    <div className="flex gap-1">
+    <div className="flex gap-1.5">
       {BUTTONS.map((b) => {
         const pressed = current === b.status;
-        const className = `grid size-7 place-items-center rounded-full text-xs shadow-md backdrop-blur-sm transition-colors ${
+        // 28px de desenho, 36px de área de toque (o ::after invisível em volta).
+        const className = `relative grid size-7 place-items-center rounded-full text-xs shadow-md backdrop-blur-sm transition-colors after:absolute after:-inset-1 after:content-[''] ${
           pressed ? "bg-accent text-accent-ink" : "bg-black/65 text-foreground hover:bg-black/85"
         }`;
         const label = `${b.label}: ${movie.title}`;

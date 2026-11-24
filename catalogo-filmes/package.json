@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:seguranca": "vitest run --config vitest.integration.config.ts"
+    "test:seguranca": "vitest run --config vitest.integration.config.ts tests-integration/rls.test.ts",
+    "test:paginas": "vitest run --config vitest.integration.config.ts tests-integration/pages.test.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
