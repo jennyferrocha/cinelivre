@@ -10,6 +10,23 @@ Dados: [TMDB](https://www.themoviedb.org/) e JustWatch.
    (themoviedb.org → Configurações → API → "API Read Access Token").
 3. Rode `npm run dev` e abra http://localhost:3000
 
+## Contas (Supabase, opcional)
+
+Sem estas variáveis o app funciona normalmente, só sem login e listas.
+
+1. Crie um projeto em supabase.com e, em **Authentication → Sign In / Providers → Email**, desligue
+   **Confirm email**.
+2. Em **SQL Editor → New query**, cole o conteúdo de `supabase/schema.sql` e clique em **Run**.
+   Em **Table Editor** devem aparecer `movie_marks` e `user_settings` com o selo de RLS ligado.
+3. Em **Project Settings → API Keys** (e **Data API** para a URL), copie a **Project URL** e a chave
+   **publishable** (ou **anon public**) para o `.env.local`:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
+   ```
+   ⚠️ Nunca use a chave **secret / service_role**: ela ignora as regras de segurança.
+4. Reinicie o `npm run dev`.
+
 ## Testes
 
 `npm test`
