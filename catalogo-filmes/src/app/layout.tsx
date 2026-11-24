@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
-import { Big_Shoulders, Geist } from "next/font/google";
+import { Plus_Jakarta_Sans, Sora } from "next/font/google";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Interface (botões, textos, etiquetas)
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
 });
 
-// Letreiro condensado, como a marquise de um cinema de rua.
-const bigShoulders = Big_Shoulders({
-  variable: "--font-big-shoulders",
+// Títulos e números grandes
+const sora = Sora({
+  variable: "--font-sora",
   subsets: ["latin"],
 });
 
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="pt-BR" className={`${geistSans.variable} ${bigShoulders.variable} h-full antialiased`}>
+    <html lang="pt-BR" className={`${jakarta.variable} ${sora.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <Header />
         {children}

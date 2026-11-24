@@ -88,7 +88,7 @@ async function MovieContent({ params }: Props) {
         </div>
 
         <div className="flex min-w-0 flex-col gap-4 sm:pt-28">
-          <h1 className="font-display text-3xl leading-tight font-black text-balance sm:text-5xl">
+          <h1 className="font-display text-3xl leading-tight font-extrabold text-balance sm:text-4xl">
             {movie.title}
             {movie.year && <span className="font-medium text-foreground/60"> ({movie.year})</span>}
           </h1>

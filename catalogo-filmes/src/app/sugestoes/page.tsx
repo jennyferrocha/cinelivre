@@ -51,7 +51,7 @@ async function Suggestions({ searchParams }: { searchParams: SearchParams }) {
 export default function SuggestionsPage({ searchParams }: { searchParams: SearchParams }) {
   return (
     <main className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 pt-6 pb-16 sm:px-10">
-      <h1 className="font-display text-3xl font-black sm:text-4xl">🎲 O que eu assisto hoje?</h1>
+      <h1 className="font-display text-2xl font-extrabold sm:text-3xl">🎲 O que eu assisto hoje?</h1>
       <Suspense fallback={<MovieRowSkeleton />}>
         <Suggestions searchParams={searchParams} />
       </Suspense>

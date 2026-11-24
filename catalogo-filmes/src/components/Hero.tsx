@@ -60,7 +60,7 @@ export function Hero({ movie, genre, logo, rank }: Props) {
               className="h-auto max-h-36 w-auto max-w-[min(30rem,82vw)] object-contain object-left drop-shadow-[0_4px_24px_rgba(0,0,0,0.55)] sm:max-h-44"
             />
           ) : (
-            <span className="font-display text-6xl leading-[0.9] font-black text-balance uppercase sm:text-8xl">
+            <span className="font-display text-4xl leading-[1.05] font-extrabold text-balance sm:text-6xl">
               {movie.title}
             </span>
           )}

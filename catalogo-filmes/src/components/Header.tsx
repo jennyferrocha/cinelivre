@@ -5,7 +5,7 @@ import { SearchIcon, SlidersIcon } from "@/components/Icons";
 export function Header() {
   return (
     <HeaderShell>
-      <Link href="/" className="font-display text-[1.75rem] leading-none font-extrabold tracking-wide text-accent">
+      <Link href="/" className="font-display text-xl leading-none font-bold tracking-tight text-accent sm:text-2xl">
         CineLivre
       </Link>
       <nav className="flex items-center gap-1 text-sm sm:gap-2">

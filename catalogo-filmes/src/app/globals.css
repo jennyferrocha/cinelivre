@@ -1,20 +1,21 @@
 @import "tailwindcss";
 
 /*
- * CineLivre: o escuro aveludado de uma sala de cinema,
- * iluminado pela luz quente do projetor.
+ * CineLivre: noite roxa de cinema (fundo em degradê do azul-escuro ao violeta),
+ * com a luz amarela do projetor nos destaques e nas estrelas.
  */
 @theme inline {
-  --color-background: #140c12; /* veludo da poltrona */
-  --color-surface: #22151e;
-  --color-surface-2: #2e1e29;
-  --color-line: #43303d;
-  --color-foreground: #f6eee6; /* papel da tela */
-  --color-muted: #b5a3ae;
+  --color-background: #1a1238; /* topo do degradê */
+  --color-background-end: #2e1a5e; /* pé do degradê, violeta */
+  --color-surface: #251a4d;
+  --color-surface-2: #31245f;
+  --color-line: #463a7a;
+  --color-foreground: #f5f3ff;
+  --color-muted: #b4acd8;
   --color-accent: #ffc56b; /* luz do projetor */
   --color-accent-ink: #1a0f0a;
-  --font-sans: var(--font-geist-sans);
-  --font-display: var(--font-big-shoulders);
+  --font-sans: var(--font-jakarta);
+  --font-display: var(--font-sora);
 }
 
 html {
@@ -22,9 +23,11 @@ html {
 }
 
 body {
-  background: var(--color-background);
+  background-color: var(--color-background);
+  background-image: linear-gradient(180deg, var(--color-background) 0%, #241653 45%, var(--color-background-end) 100%);
+  background-attachment: fixed;
   color: var(--color-foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-jakarta), system-ui, sans-serif;
   overflow-x: hidden;
 }
 

@@ -145,6 +145,8 @@ da Netflix**.
 - **Nome do app provisório** ("CineLivre" nos esboços); a autora pode escolher outro depois.
 - **Paleta:** fundo quase preto com uma cor de destaque própria (amarelo nos esboços), longe do
   vermelho da Netflix.
+  *Atualizado em 2026-11-24 pela autora:* fundo em degradê roxo-azulado (do `#1a1238` ao violeta
+  `#2e1a5e`), destaque amarelo mantido; fontes **Plus Jakarta Sans** (interface) e **Sora** (títulos).
 
 ## 7. Preparação para a etapa 2 (não construir agora)
 

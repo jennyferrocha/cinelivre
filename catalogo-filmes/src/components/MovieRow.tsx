@@ -2,7 +2,7 @@ import { MovieCard } from "@/components/MovieCard";
 import { RowScroller } from "@/components/RowScroller";
 import type { MovieCard as MovieCardData } from "@/lib/movies/discover";
 
-const titleClass = "px-4 font-display text-2xl font-bold tracking-wide sm:px-10 sm:text-3xl";
+const titleClass = "px-4 font-display text-lg font-semibold sm:px-10 sm:text-xl";
 
 /** Fileira horizontal que desliza para o lado. */
 export function MovieRow({ title, movies }: { title: string; movies: MovieCardData[] }) {
@@ -32,7 +32,7 @@ export function RankedRow({ title, movies }: { title: string; movies: MovieCardD
             <li key={movie.id} className="relative flex shrink-0 snap-start items-end">
               <span
                 aria-hidden
-                className="rank-numeral -mr-3 mb-11 translate-y-[0.06em] font-display text-[7.5rem] leading-[0.8] font-black tracking-tighter select-none sm:-mr-4 sm:text-[10.5rem]"
+                className="rank-numeral -mr-3 mb-11 translate-y-[0.06em] font-display text-[6rem] leading-[0.8] font-extrabold tracking-tighter select-none sm:-mr-4 sm:text-[8rem]"
               >
                 {i + 1}
               </span>

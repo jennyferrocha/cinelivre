@@ -56,7 +56,7 @@ async function Results({ searchParams }: { searchParams: SearchParams }) {
 export default function SearchPage({ searchParams }: { searchParams: SearchParams }) {
   return (
     <main className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 pt-6 pb-16 sm:px-10">
-      <h1 className="font-display text-3xl font-black sm:text-4xl">Buscar filme</h1>
+      <h1 className="font-display text-2xl font-extrabold sm:text-3xl">Buscar filme</h1>
       <Suspense fallback={<div className="h-12 max-w-2xl rounded-md bg-surface-2" />}>
         <SearchForm searchParams={searchParams} />
       </Suspense>
