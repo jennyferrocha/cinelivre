@@ -2,6 +2,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 const createSupabaseServer = vi.fn();
 vi.mock("@/lib/supabase/server", () => ({ createSupabaseServer }));
+const calls: string[] = [];
+vi.mock("next/server", () => ({ connection: vi.fn(async () => { calls.push("connection"); }) }));
 
 const { getCurrentUser } = await import("@/lib/auth/session");
 
@@ -23,6 +25,16 @@ describe("getCurrentUser", () => {
   it("exceção (Supabase fora do ar) vira 'ninguém logado'", async () => {
     createSupabaseServer.mockResolvedValue(clientWith(async () => { throw new Error("rede"); }));
     expect(await getCurrentUser()).toBeNull();
+  });
+
+  it("marca a leitura como 'na hora do pedido' antes de consultar o Supabase (Next 16)", async () => {
+    calls.length = 0;
+    createSupabaseServer.mockImplementation(async () => {
+      calls.push("supabase");
+      return clientWith(async () => ({ data: { user: null }, error: null }));
+    });
+    await getCurrentUser();
+    expect(calls).toEqual(["connection", "supabase"]);
   });
 
   it("com sessão válida, devolve id e e-mail", async () => {

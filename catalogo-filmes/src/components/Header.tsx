@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { HeaderShell } from "@/components/HeaderShell";
 import { SearchIcon, SlidersIcon } from "@/components/Icons";
+import { UserMenu } from "@/components/UserMenu";
 
 export function Header() {
   return (
@@ -20,7 +22,7 @@ export function Header() {
             name="q"
             placeholder="Buscar filme"
             aria-label="Buscar filme"
-            className="w-28 min-w-0 bg-transparent pl-4 text-sm outline-none placeholder:text-foreground/70 min-[400px]:w-36 sm:w-52 [&::-webkit-search-cancel-button]:hidden"
+            className="w-24 min-w-0 bg-transparent pl-4 text-sm outline-none placeholder:text-foreground/70 min-[400px]:w-36 sm:w-52 [&::-webkit-search-cancel-button]:hidden"
           />
           <button
             type="submit"
@@ -37,6 +39,9 @@ export function Header() {
           <SlidersIcon />
           <span className="max-sm:sr-only">Meus streamings</span>
         </Link>
+        <Suspense fallback={<span className="size-10" />}>
+          <UserMenu />
+        </Suspense>
       </nav>
     </HeaderShell>
   );

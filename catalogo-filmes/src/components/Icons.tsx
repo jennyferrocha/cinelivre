@@ -63,3 +63,12 @@ export function StarIcon({ className = "size-4" }: IconProps) {
     </svg>
   );
 }
+
+export function UserIcon({ className = "size-5" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} {...base}>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" />
+    </svg>
+  );
+}
