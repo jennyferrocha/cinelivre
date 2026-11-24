@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { AllStreamingsBanner } from "@/components/AllStreamingsBanner";
 import { FilterForm } from "@/components/FilterForm";
 import { MarksProvider } from "@/components/MarksProvider";
 import { MovieGrid } from "@/components/MovieGrid";
@@ -12,7 +12,7 @@ import { discoverMovies } from "@/lib/movies/discover";
 import { parseFilterParams } from "@/lib/movies/filters";
 import { getGenres } from "@/lib/movies/genres";
 import { getServiceGroups } from "@/lib/providers/service";
-import { getSelection } from "@/lib/selection-server";
+import { getEffectiveSelection } from "@/lib/selection-server";
 
 export const metadata: Metadata = {
   title: "O que eu assisto hoje? · CineLivre",
@@ -22,8 +22,7 @@ type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 async function Suggestions({ searchParams }: { searchParams: SearchParams }) {
   const filters = parseFilterParams(await searchParams);
-  const selection = await getSelection();
-  if (!selection) redirect("/streamings");
+  const { selection, chosen } = await getEffectiveSelection();
 
   const [groups, genres] = await Promise.all([getServiceGroups(), getGenres()]);
   const marksState = await loadMarks();
@@ -35,6 +34,7 @@ async function Suggestions({ searchParams }: { searchParams: SearchParams }) {
 
   return (
     <MarksProvider enabled={marksState.enabled} loggedIn={marksState.loggedIn} initial={marksState.byId}>
+      {!chosen && <AllStreamingsBanner />}
       <FilterForm genres={genres} filters={filters} />
       <section aria-live="polite" className="flex flex-col gap-5">
         {movies.length > 0 ? (

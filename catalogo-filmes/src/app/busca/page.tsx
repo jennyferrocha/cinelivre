@@ -7,7 +7,7 @@ import { MovieRowSkeleton } from "@/components/MovieRow";
 import { loadMarks } from "@/lib/marks/load";
 import { normalizeQuery, searchMovies } from "@/lib/movies/search";
 import { getServiceGroups } from "@/lib/providers/service";
-import { getSelection } from "@/lib/selection-server";
+import { getEffectiveSelection } from "@/lib/selection-server";
 
 export const metadata: Metadata = { title: "Buscar filme · CineLivre" };
 
@@ -43,7 +43,7 @@ async function Results({ searchParams }: { searchParams: SearchParams }) {
   const q = normalizeQuery((await searchParams).q);
   if (!q) return <p className="text-muted">Digite o nome de um filme para buscar.</p>;
 
-  const [selection, groups] = await Promise.all([getSelection(), getServiceGroups()]);
+  const [selection, groups] = await Promise.all([getEffectiveSelection().then((e) => e.selection), getServiceGroups()]);
   const [movies, marksState] = await Promise.all([searchMovies(q, selection, groups), loadMarks()]);
   if (movies.length === 0) {
     return <p className="py-10 text-center text-lg">Nenhum filme encontrado para &ldquo;{q}&rdquo;.</p>;

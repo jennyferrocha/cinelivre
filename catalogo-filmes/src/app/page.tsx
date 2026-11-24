@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import { AllStreamingsBanner } from "@/components/AllStreamingsBanner";
 import { Hero, HeroSkeleton } from "@/components/Hero";
 import { HomeTabs, TabsNav } from "@/components/HomeTabs";
 import { MarkedList } from "@/components/MarkedList";
@@ -18,7 +18,7 @@ import { parseRating } from "@/lib/movies/filters";
 import { genreNames, getGenres } from "@/lib/movies/genres";
 import { getMovieLogo } from "@/lib/movies/logo";
 import { getServiceGroups } from "@/lib/providers/service";
-import { getSelection } from "@/lib/selection-server";
+import { getEffectiveSelection } from "@/lib/selection-server";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -26,7 +26,8 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   const sp = await searchParams;
   const tab = parseTab(sp.aba);
   const nota = parseRating(sp.nota);
-  const selection = await getSelection();
+  // Sem escolha da pessoa, vale "todos os streamings" (chosen = false mostra o convite).
+  const { selection, chosen } = await getEffectiveSelection();
 
   // Abas "Quero assistir" / "Já assisti": funcionam mesmo sem streamings escolhidos.
   if (tab !== "para-voce") {
@@ -38,7 +39,6 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
     );
   }
 
-  if (!selection) redirect("/streamings");
   const marksState = await loadMarks();
   const watched = watchedIds(marksState.marks); // o que a pessoa já viu sai das sugestões
 
@@ -82,6 +82,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
         <AmbientLight src={hero.backdropUrl} />
         <Hero movie={heroMovie} genre={genreNames(hero.genreIds, genres)[0] ?? null} logo={logo} rank={rank} />
         <div className="relative z-10 -mt-28 flex flex-col gap-8 sm:-mt-36">
+          {!chosen && <AllStreamingsBanner />}
           <RatingFilter active={nota} />
           <RankedRow
             title={`Top 10 em alta nos seus streamings${nota ? ` · nota ${nota}+` : ""}`}
