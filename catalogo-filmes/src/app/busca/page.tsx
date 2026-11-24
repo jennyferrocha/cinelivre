@@ -20,7 +20,8 @@ async function SearchForm({ searchParams }: { searchParams: SearchParams }) {
         type="search"
         name="q"
         defaultValue={q}
-        autoFocus
+        // Só foca o campo quando a página abre vazia; com resultados, o teclado do celular os cobriria.
+        autoFocus={!q}
         placeholder="Nome do filme"
         aria-label="Nome do filme"
         className="min-w-0 flex-1 rounded-md border border-foreground/20 bg-surface-2 px-4 py-3 text-base outline-none placeholder:text-muted focus:border-accent"

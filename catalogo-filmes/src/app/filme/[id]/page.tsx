@@ -134,7 +134,7 @@ async function MovieContent({ params }: Props) {
               <ul className="flex flex-wrap gap-2">
                 {movie.allServicesBR.map((s) => (
                   <li
-                    key={s.name}
+                    key={s.key}
                     className={`flex items-center gap-2 rounded-full py-1 pr-3.5 pl-1 text-sm font-medium ${
                       s.mine ? "bg-accent text-background" : "bg-surface-2 text-foreground/55"
                     }`}

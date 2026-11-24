@@ -9,7 +9,7 @@ import type { TmdbMovieDetails, TmdbProvider, TmdbReleaseDates, TmdbVideo } from
 const DETAILS_REVALIDATE = 21600; // 6 horas
 const MAX_CAST = 6;
 
-export type WhereToWatch = { name: string; logoUrl: string | null; mine: boolean };
+export type WhereToWatch = { key: string; name: string; logoUrl: string | null; mine: boolean };
 
 export type MovieDetails = MovieCard & {
   runtime: string | null;
@@ -56,12 +56,25 @@ function whereToWatch(
     if (seen.has(key)) continue;
     seen.add(key);
     result.push({
+      key,
       name: group?.name ?? p.provider_name,
       logoUrl: imageUrl(group?.logoPath || p.logo_path || null, "w92"),
       mine: myKeys.has(key) || myKeys.has(`free-${p.provider_id}`),
     });
   }
   return result;
+}
+
+/** Sinopse em inglês, para quando o TMDB não tem a em português. */
+async function englishOverview(id: number): Promise<string> {
+  const english = await tmdbFetch<TmdbMovieDetails>(`/movie/${id}`, { language: "en-US" }, DETAILS_REVALIDATE);
+  return english.overview?.trim() ?? "";
+}
+
+/** Para o destaque: sem sinopse em português, usa a em inglês em vez de deixar vazio. */
+export async function withEnglishOverview(card: MovieCard): Promise<MovieCard> {
+  if (card.overview.trim()) return card;
+  return { ...card, overview: await englishOverview(card.id) };
 }
 
 /** Tudo que a página de detalhe precisa. Filme que não existe → null. */
@@ -82,11 +95,7 @@ export async function getMovieDetails(
     throw error;
   }
 
-  let overview = data.overview?.trim() ?? "";
-  if (!overview) {
-    const english = await tmdbFetch<TmdbMovieDetails>(`/movie/${id}`, { language: "en-US" }, DETAILS_REVALIDATE);
-    overview = english.overview?.trim() ?? "";
-  }
+  const overview = data.overview?.trim() || (await englishOverview(id));
 
   const services = selection ? availableServices(data["watch/providers"]?.results.BR, selection, groups) : [];
   const card = toMovieCard({ ...data, overview, genre_ids: data.genres.map((g) => g.id) }, services);

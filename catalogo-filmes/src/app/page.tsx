@@ -7,6 +7,7 @@ import { Hero, HeroSkeleton } from "@/components/Hero";
 import { MovieRow, MovieRowSkeleton, RankedRow } from "@/components/MovieRow";
 import { RatingFilter } from "@/components/RatingFilter";
 import { discoverMovies, HOME_ROWS, pickHero, withMinRating } from "@/lib/movies/discover";
+import { withEnglishOverview } from "@/lib/movies/details";
 import { parseRating } from "@/lib/movies/filters";
 import { genreNames, getGenres } from "@/lib/movies/genres";
 import { getMovieLogo } from "@/lib/movies/logo";
@@ -50,14 +51,14 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
     );
   }
 
-  const logo = await getMovieLogo(hero.id);
+  const [heroMovie, logo] = await Promise.all([withEnglishOverview(hero), getMovieLogo(hero.id)]);
   const [trending, ...others] = rows;
   const rank = trending.movies.indexOf(hero) + 1 || null;
 
   return (
     <div className="relative isolate">
       <AmbientLight src={hero.backdropUrl} />
-      <Hero movie={hero} genre={genreNames(hero.genreIds, genres)[0] ?? null} logo={logo} rank={rank} />
+      <Hero movie={heroMovie} genre={genreNames(hero.genreIds, genres)[0] ?? null} logo={logo} rank={rank} />
       <div className="relative z-10 -mt-28 flex flex-col gap-8 sm:-mt-36">
         <RatingFilter active={nota} />
         <RankedRow

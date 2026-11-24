@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import fixture from "../fixtures/movie-details.json";
-import { brCertification, formatRuntime, getMovieDetails, pickTrailer } from "@/lib/movies/details";
+import { brCertification, formatRuntime, getMovieDetails, pickTrailer, withEnglishOverview } from "@/lib/movies/details";
 import type { ServiceGroup } from "@/lib/providers/grouping";
 
 const groups: ServiceGroup[] = [
@@ -93,8 +93,8 @@ describe("getMovieDetails (com TMDB simulado)", () => {
 
     // fixture: flatrate 1899 (HBO Max), 484 (Claro), 1825 (HBO Max Amazon Channel → mesmo grupo); buy 2, 10
     expect(movie!.allServicesBR).toEqual([
-      { name: "HBO Max", logoUrl: "https://image.tmdb.org/t/p/w92/max.jpg", mine: true },
-      { name: "Claro video", logoUrl: "https://image.tmdb.org/t/p/w92/claro.jpg", mine: false },
+      { key: "hbo-max", name: "HBO Max", logoUrl: "https://image.tmdb.org/t/p/w92/max.jpg", mine: true },
+      { key: "claro-video", name: "Claro video", logoUrl: "https://image.tmdb.org/t/p/w92/claro.jpg", mine: false },
     ]);
   });
 
@@ -105,6 +105,20 @@ describe("getMovieDetails (com TMDB simulado)", () => {
     const movie = await getMovieDetails(460465, null, groups);
     expect(movie!.overview).toBe("In English");
     expect(movie!.services).toEqual([]);
+  });
+
+  it("destaque sem sinopse em português ganha a em inglês", async () => {
+    fetchMock.mockResolvedValue(json({ ...fixture, overview: "In English" }));
+    const card = { id: 460465, overview: "", title: "Mortal Kombat" } as Parameters<typeof withEnglishOverview>[0];
+    const result = await withEnglishOverview(card);
+    expect(result.overview).toBe("In English");
+    expect(fetchMock.mock.calls[0][0]).toContain("language=en-US");
+  });
+
+  it("destaque que já tem sinopse não chama o TMDB", async () => {
+    const card = { id: 1, overview: "Em português", title: "X" } as Parameters<typeof withEnglishOverview>[0];
+    expect(await withEnglishOverview(card)).toBe(card);
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("filme que não existe (404) devolve null", async () => {

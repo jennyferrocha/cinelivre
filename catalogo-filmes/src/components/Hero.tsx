@@ -70,6 +70,7 @@ export function Hero({ movie, genre, logo, rank }: Props) {
           {formatRating(movie.rating) && (
             <span className="flex items-center gap-1 font-semibold text-accent">
               <StarIcon />
+              <span className="sr-only">Nota </span>
               {formatRating(movie.rating)}
             </span>
           )}
@@ -107,7 +108,7 @@ export function Hero({ movie, genre, logo, rank }: Props) {
             className="flex items-center gap-2 rounded-md bg-foreground/15 px-6 py-3 font-semibold backdrop-blur-md transition-colors hover:bg-foreground/25"
           >
             <DiceIcon />
-            Sortear um filme
+            O que eu assisto hoje?
           </Link>
         </div>
       </div>
