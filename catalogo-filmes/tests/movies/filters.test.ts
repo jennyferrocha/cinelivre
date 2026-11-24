@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatRating, parseRating, RATING_OPTIONS } from "@/lib/movies/filters";
+import { formatRating, parseFilterParams, parseRating, pickRandom, RATING_OPTIONS } from "@/lib/movies/filters";
 
 describe("parseRating", () => {
   it("aceita as opções 6, 7 e 8", () => {
@@ -26,5 +26,44 @@ describe("formatRating", () => {
 
   it("nota zero não aparece", () => {
     expect(formatRating(0)).toBeNull();
+  });
+});
+
+describe("parseFilterParams", () => {
+  it("lê todos os filtros da URL", () => {
+    expect(parseFilterParams({ generos: "35,10749", duracao: "120", nota: "7", desde: "2015" })).toEqual({
+      sortBy: "popularity.desc",
+      genres: [35, 10749],
+      maxRuntime: 120,
+      minRating: 7,
+      releasedFrom: "2015-01-01",
+    });
+  });
+
+  it("sem filtros fica só a ordenação", () => {
+    expect(parseFilterParams({})).toEqual({ sortBy: "popularity.desc" });
+  });
+
+  it("ignora valores inválidos", () => {
+    expect(parseFilterParams({ generos: "abc,35", duracao: "-5", nota: "99", desde: "x" })).toEqual({
+      sortBy: "popularity.desc",
+      genres: [35],
+    });
+    expect(parseFilterParams({ duracao: "100", desde: "1999" })).toEqual({ sortBy: "popularity.desc" });
+  });
+
+  it("aceita gêneros repetidos na URL (?generos=35&generos=28)", () => {
+    expect(parseFilterParams({ generos: ["35", "28", "35"] })).toEqual({ sortBy: "popularity.desc", genres: [35, 28] });
+  });
+});
+
+describe("pickRandom", () => {
+  it("lista vazia devolve undefined", () => {
+    expect(pickRandom([], () => 0)).toBeUndefined();
+  });
+
+  it("usa o sorteio para escolher", () => {
+    expect(pickRandom(["a", "b", "c"], () => 0.99)).toBe("c");
+    expect(pickRandom(["a", "b", "c"], () => 0)).toBe("a");
   });
 });
