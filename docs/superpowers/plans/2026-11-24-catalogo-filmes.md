@@ -82,7 +82,7 @@ type MovieCard = { id: number; title: string; year: string; posterUrl: string | 
 
 ---
 
-### Tarefa 1: Projeto, git e testes funcionando
+### Task 1: Projeto, git e testes funcionando
 
 **Files:**
 - Create: `.gitignore` (raiz), `catalogo-filmes/` (via create-next-app), `catalogo-filmes/vitest.config.ts`, `catalogo-filmes/.env.example`, `catalogo-filmes/README.md`
@@ -100,7 +100,7 @@ type MovieCard = { id: number; title: string; year: string; posterUrl: string | 
 - [ ] **Step 7:** **Checkpoint:** `npm run dev` e abrir http://localhost:3000, mostrando a página padrão do Next.
 - [ ] **Step 8:** Commit: `chore: cria projeto Next.js com Vitest` (inclui `docs/`).
 
-### Tarefa 2: Cliente do TMDB
+### Task 2: Cliente do TMDB
 
 **Files:**
 - Create: `src/lib/tmdb/client.ts`, `src/lib/tmdb/types.ts`
@@ -130,7 +130,7 @@ it('imageUrl monta url e devolve null sem caminho', () => {
 - [ ] **Step 5:** **Checkpoint:** página temporária `src/app/teste/page.tsx` que mostra os títulos de `tmdbFetch('/movie/popular')`. Ver os títulos em português no navegador e depois apagar a página. Explique "isto rodou no servidor; abra o DevTools → Rede e veja que a chave não aparece".
 - [ ] **Step 6:** Commit: `feat: cliente do TMDB no servidor`.
 
-### Tarefa 3: Agrupamento de provedores e disponibilidade
+### Task 3: Agrupamento de provedores e disponibilidade
 
 **Files:**
 - Create: `src/lib/providers/grouping.ts`, `src/lib/providers/availability.ts`, `src/lib/providers/free.ts`, `src/lib/providers/service.ts`
@@ -166,7 +166,7 @@ expect(baseServiceName('Max')).toBe('Max');
 - [ ] **Step 5:** `npm test` e espere PASS.
 - [ ] **Step 6:** Commit: `feat: agrupa provedores e verifica disponibilidade`.
 
-### Tarefa 4: Seleção de streamings (cookie) e tela `/streamings`
+### Task 4: Seleção de streamings (cookie) e tela `/streamings`
 
 **Files:**
 - Create: `src/lib/selection.ts`, `src/lib/selection-server.ts`, `src/components/ProviderPicker.tsx`, `src/app/streamings/page.tsx`
@@ -196,7 +196,7 @@ expect(parseSelection(serializeSelection({ services: [], includeFree: true })))
 - [ ] **Step 6:** **Checkpoint:** abrir `/streamings`, marcar dois serviços e clicar em Começar. No DevTools → Aplicativo → Cookies, ver o cookie `cinelivre-selecao`. Explique cookie × localStorage.
 - [ ] **Step 7:** Commit: `feat: escolha de streamings salva no aparelho`.
 
-### Tarefa 5: Busca de listas com verificação por filme
+### Task 5: Busca de listas com verificação por filme
 
 **Files:**
 - Create: `src/lib/movies/discover.ts`, `src/lib/concurrency.ts`
@@ -230,7 +230,7 @@ expect(parseSelection(serializeSelection({ services: [], includeFree: true })))
 - [ ] **Step 2:** `npm test` e espere FAIL. **Step 3:** implemente. **Step 4:** `npm test` e espere PASS.
 - [ ] **Step 5:** Commit: `feat: listas do discover filtradas pelos streamings da pessoa`.
 
-### Tarefa 6: Tela inicial (layout A)
+### Task 6: Tela inicial (layout A)
 
 **Files:**
 - Create: `src/components/Header.tsx`, `Footer.tsx`, `Hero.tsx`, `MovieRow.tsx`, `MovieCard.tsx`, `src/app/error.tsx`, `src/app/loading.tsx`, `public/tmdb-logo.svg`
@@ -255,7 +255,7 @@ expect(parseSelection(serializeSelection({ services: [], includeFree: true })))
 - [ ] **Step 6:** **Checkpoint:** abrir `/` no computador e no modo celular do DevTools (375px). Conferir que as etiquetas batem com os streamings escolhidos. Mudar o `TMDB_TOKEN` para um valor errado, ver a página de erro amigável e depois voltar o token certo.
 - [ ] **Step 7:** Commit: `feat: tela inicial com destaque e fileiras`.
 
-### Tarefa 7: Detalhe do filme
+### Task 7: Detalhe do filme
 
 **Files:**
 - Create: `src/lib/movies/details.ts`, `src/app/filme/[id]/page.tsx`, `src/app/filme/[id]/not-found.tsx`
@@ -281,7 +281,7 @@ expect(parseSelection(serializeSelection({ services: [], includeFree: true })))
 - [ ] **Step 5:** **Checkpoint:** tocar num pôster da tela inicial e conferir o detalhe e o trailer. Abrir `/filme/999999999` e ver a página "Filme não encontrado".
 - [ ] **Step 6:** Commit: `feat: página de detalhe do filme`.
 
-### Tarefa 8: "O que eu assisto hoje?" e "Me surpreenda"
+### Task 8: "O que eu assisto hoje?" e "Me surpreenda"
 
 **Files:**
 - Create: `src/lib/movies/filters.ts`, `src/components/FilterForm.tsx`, `src/components/MovieGrid.tsx`, `src/components/SurpriseButton.tsx`, `src/app/sugestoes/page.tsx`
@@ -308,7 +308,7 @@ expect(pickRandom(['a','b','c'], () => 0.99)).toBe('c');
 - [ ] **Step 4:** **Checkpoint:** escolher Comédia + até 2h, ver os resultados, clicar em "Me surpreenda" e cair no detalhe de um deles. Recarregar a página e ver que os filtros continuam marcados.
 - [ ] **Step 5:** Commit: `feat: filtros de sugestões e me surpreenda`.
 
-### Tarefa 9: Busca por nome
+### Task 9: Busca por nome
 
 **Files:**
 - Create: `src/lib/movies/search.ts`, `src/app/busca/page.tsx`
@@ -333,7 +333,7 @@ expect(normalizeQuery('  ação & cia ')).toBe('ação & cia');
 - [ ] **Step 4:** **Checkpoint:** buscar um filme que está num dos seus streamings e um que não está, e ver as duas etiquetas.
 - [ ] **Step 5:** Commit: `feat: busca por nome`.
 
-### Tarefa 10: Revisão final e publicação na Vercel
+### Task 10: Revisão final e publicação na Vercel
 
 **Files:**
 - Modify: `catalogo-filmes/README.md`, `src/app/layout.tsx` (metadata: título "CineLivre", descrição, `lang="pt-BR"`)
