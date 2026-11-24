@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseSelection, selectionFromForm, serializeSelection } from "@/lib/selection";
+import { allServicesSelection, parseSelection, selectionFromForm, serializeSelection } from "@/lib/selection";
 
 describe("parseSelection / serializeSelection", () => {
   it("ida e volta preserva a seleção", () => {
@@ -58,5 +58,14 @@ describe("selectionFromForm", () => {
     form.append("services", "hacker");
     form.append("includeFree", "on");
     expect(selectionFromForm(form, ["netflix"])).toEqual({ services: [], includeFree: true });
+  });
+});
+
+describe("allServicesSelection", () => {
+  it("sem escolha, vale todos os serviços (inclusive canais) e os grátis", () => {
+    expect(allServicesSelection([{ key: "netflix" }, { key: "paramount-plus-amazon-channel" }])).toEqual({
+      services: ["netflix", "paramount-plus-amazon-channel"],
+      includeFree: true,
+    });
   });
 });

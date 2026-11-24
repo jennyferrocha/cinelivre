@@ -12,7 +12,7 @@ const getAccountSelection = vi.fn();
 vi.mock("@/lib/auth/session", () => ({ getCurrentUser }));
 vi.mock("@/lib/settings/store", () => ({ getAccountSelection }));
 
-const { getSelection } = await import("@/lib/selection-server");
+const { getEffectiveSelection, getSelection } = await import("@/lib/selection-server");
 
 const device = { services: ["netflix"], includeFree: true };
 const account = { services: ["hbo-max"], includeFree: false };
@@ -49,5 +49,41 @@ describe("getSelection", () => {
     getCurrentUser.mockResolvedValue({ id: "u1", email: "a@b.c" });
     getAccountSelection.mockResolvedValue({ services: ["sumiu", "netflix"], includeFree: false });
     expect(await getSelection()).toEqual({ services: ["netflix"], includeFree: false });
+  });
+});
+
+describe("getEffectiveSelection", () => {
+  const all = { services: ["netflix", "hbo-max"], includeFree: true };
+
+  afterEach(() => {
+    cookieValue = undefined;
+    getCurrentUser.mockReset();
+    getAccountSelection.mockReset();
+  });
+
+  it("sem escolha nenhuma: todos os streamings, marcado como não escolhido", async () => {
+    getCurrentUser.mockResolvedValue(null);
+    expect(await getEffectiveSelection()).toEqual({ selection: all, chosen: false });
+  });
+
+  it("cookie corrompido conta como sem escolha", async () => {
+    cookieValue = "{x";
+    getCurrentUser.mockResolvedValue(null);
+    expect(await getEffectiveSelection()).toEqual({ selection: all, chosen: false });
+  });
+
+  it("logada sem escolha na conta nem no aparelho: todos", async () => {
+    getCurrentUser.mockResolvedValue({ id: "u1", email: "a@b.c" });
+    getAccountSelection.mockResolvedValue(null);
+    expect(await getEffectiveSelection()).toEqual({ selection: all, chosen: false });
+  });
+
+  it("com escolha real (aparelho ou conta): usa ela", async () => {
+    cookieValue = JSON.stringify(device);
+    getCurrentUser.mockResolvedValue(null);
+    expect(await getEffectiveSelection()).toEqual({ selection: device, chosen: true });
+    getCurrentUser.mockResolvedValue({ id: "u1", email: "a@b.c" });
+    getAccountSelection.mockResolvedValue(account);
+    expect(await getEffectiveSelection()).toEqual({ selection: account, chosen: true });
   });
 });

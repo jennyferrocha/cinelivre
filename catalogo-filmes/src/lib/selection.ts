@@ -42,3 +42,8 @@ export function selectionFromForm(form: FormData, validKeys: string[]): Selectio
   const services = form.getAll("services").filter((v): v is string => typeof v === "string");
   return normalize({ services, includeFree: form.get("includeFree") === "on" }, validKeys);
 }
+
+/** Sem escolha da pessoa: vale "todos os streamings do Brasil" (todos os serviços + os grátis). */
+export function allServicesSelection(groups: { key: string }[]): Selection {
+  return { services: groups.map((g) => g.key), includeFree: true };
+}
