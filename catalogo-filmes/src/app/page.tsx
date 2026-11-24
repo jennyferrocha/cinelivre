@@ -4,12 +4,15 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { Hero, HeroSkeleton } from "@/components/Hero";
+import { HomeTabs, TabsNav } from "@/components/HomeTabs";
+import { MarkedList } from "@/components/MarkedList";
 import { MarksProvider } from "@/components/MarksProvider";
 import { MovieRow, MovieRowSkeleton, RankedRow } from "@/components/MovieRow";
 import { RatingFilter } from "@/components/RatingFilter";
 import { discoverMovies, HOME_ROWS, pickHero, withMinRating } from "@/lib/movies/discover";
 import { loadMarks } from "@/lib/marks/load";
 import { watchedIds } from "@/lib/marks/rules";
+import { parseTab } from "@/lib/marks/tabs";
 import { withEnglishOverview } from "@/lib/movies/details";
 import { parseRating } from "@/lib/movies/filters";
 import { genreNames, getGenres } from "@/lib/movies/genres";
@@ -20,8 +23,21 @@ import { getSelection } from "@/lib/selection-server";
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
-  const nota = parseRating((await searchParams).nota);
+  const sp = await searchParams;
+  const tab = parseTab(sp.aba);
+  const nota = parseRating(sp.nota);
   const selection = await getSelection();
+
+  // Abas "Quero assistir" / "Já assisti": funcionam mesmo sem streamings escolhidos.
+  if (tab !== "para-voce") {
+    const [marksState, groups] = await Promise.all([loadMarks(), getServiceGroups()]);
+    return (
+      <div className="pt-32 pb-8">
+        <MarkedList status={tab} marksState={marksState} selection={selection} groups={groups} />
+      </div>
+    );
+  }
+
   if (!selection) redirect("/streamings");
   const marksState = await loadMarks();
   const watched = watchedIds(marksState.marks); // o que a pessoa já viu sai das sugestões
@@ -116,7 +132,13 @@ function HomeSkeleton() {
 
 export default function HomePage({ searchParams }: { searchParams: SearchParams }) {
   return (
-    <main className="-mt-16 flex flex-col">
+    <main className="relative -mt-16 flex flex-col">
+      {/* Abas logo abaixo do topo, por cima da foto do destaque */}
+      <div className="absolute inset-x-0 top-16 z-20">
+        <Suspense fallback={<TabsNav active="para-voce" />}>
+          <HomeTabs />
+        </Suspense>
+      </div>
       <Suspense fallback={<HomeSkeleton />}>
         <HomeContent searchParams={searchParams} />
       </Suspense>

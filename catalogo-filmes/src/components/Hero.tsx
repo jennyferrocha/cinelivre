@@ -37,7 +37,7 @@ export function Hero({ movie, genre, logo, rank }: Props) {
         <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_85%_10%,transparent_40%,color-mix(in_srgb,var(--color-background)_55%,transparent))]" />
       </div>
 
-      <div className="flex w-full max-w-2xl flex-col items-start gap-5 px-4 pt-24 pb-36 sm:px-10 sm:pb-44">
+      <div className="flex w-full max-w-2xl flex-col items-start gap-5 px-4 pt-32 pb-36 sm:px-10 sm:pb-44">
         {rank && (
           <p className="hero-rise flex items-center gap-3" style={rise(0)}>
             <span className="font-display text-5xl leading-none font-black text-accent">{rank}º</span>
