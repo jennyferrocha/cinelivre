@@ -163,3 +163,38 @@ A etapa 2 vai adicionar login, cadastro, favoritos e "já assisti" com um banco 
 - Detalhes visuais finos (fontes, animações), respeitando o estilo aprovado nos esboços.
 - Testes: o suficiente para garantir que os filtros montam os pedidos certos ao TMDB e que nunca
   aparecem filmes fora dos streamings escolhidos.
+
+## 9. Adendo (2026-11-24): nota no card e filtro de nota na tela inicial
+
+**Intenção.** A autora quer ver a nota de cada filme já na fileira, sem abrir o detalhe, e poder
+deixar a tela inicial só com filmes bem avaliados (ex.: "só acima de 7").
+
+**Decidido com a autora**
+- A nota é a **do TMDB** (`vote_average`), não a do IMDb. A do IMDb exigiria outro serviço (OMDb),
+  outra chave e um limite de 1.000 consultas/dia, e não daria para filtrar direto no TMDB.
+- **Filtro pela URL (abordagem A):** botões "Todas / 6+ / 7+ / 8+" na tela inicial; escolher um leva
+  a `/?nota=7`. O servidor busca as fileiras de novo já com o filtro, então elas continuam cheias.
+  Recarregar ou compartilhar o link mantém o filtro. Não fica salvo no aparelho.
+
+**Abordagens consideradas**
+| Abordagem | Trade-off |
+|---|---|
+| **A. Buscar de novo com filtro, estado na URL** (escolhida) | Fileiras cheias, link compartilhável, igual à tela de sugestões; um carregamento a cada troca |
+| B. Igual à A, lembrando a escolha no aparelho | A pessoa pode esquecer que filtrou e achar que há poucos filmes |
+| C. Esconder no navegador os cards já carregados | Instantâneo, mas as fileiras encolhem ou ficam vazias |
+
+**Comportamento**
+- Card: "★ 7,3" (vírgula, uma casa) no canto superior do pôster. Sem estrela quando a nota é 0.
+- Filtro vale para **todas** as fileiras e para o **destaque**. Usa `vote_average.gte` e, como as
+  outras listas com nota mínima, `vote_count.gte` 50 (ou o mínimo maior que a fileira já tenha,
+  ex.: 300 em "Bem avaliados").
+- O botão ativo fica destacado em amarelo; "Todas" é o padrão. Valor inválido na URL (`?nota=abc`,
+  `?nota=99`) é ignorado, como se não houvesse filtro.
+- Se com o filtro nenhuma fileira tiver filmes: mensagem pedindo para escolher uma nota menor, com
+  os botões do filtro ainda visíveis.
+
+**Minhas decisões (a autora pode revisar)**
+- Os botões ficam logo abaixo do destaque, antes do Top 10.
+- A leitura do `?nota=` reaproveita a mesma regra de validação do parâmetro `nota` da Tarefa 8.
+
+**Fora deste adendo:** as etapas 7 a 9 (detalhe, sugestões, busca) seguem o plano como já está.

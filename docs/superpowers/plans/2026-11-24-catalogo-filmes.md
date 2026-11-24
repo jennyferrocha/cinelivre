@@ -255,6 +255,41 @@ expect(parseSelection(serializeSelection({ services: [], includeFree: true })))
 - [ ] **Step 6:** **Checkpoint:** abrir `/` no computador e no modo celular do DevTools (375px). Conferir que as etiquetas batem com os streamings escolhidos. Mudar o `TMDB_TOKEN` para um valor errado, ver a página de erro amigável e depois voltar o token certo.
 - [ ] **Step 7:** Commit: `feat: tela inicial com destaque e fileiras`.
 
+### Task 6b: Nota no card e filtro de nota na tela inicial (spec §9)
+
+**Files:**
+- Create: `src/lib/movies/filters.ts`, `src/components/RatingFilter.tsx`
+- Modify: `src/lib/movies/discover.ts`, `src/app/page.tsx`, `src/components/MovieCard.tsx`
+- Test: `tests/movies/filters.test.ts`, `tests/movies/discover.test.ts`
+
+**Interfaces:**
+- Consumes: `HOME_ROWS`, `DiscoverFilters`, `discoverMovies`, `pickHero`
+- Produces:
+  - `RATING_OPTIONS = [6, 7, 8] as const` e `parseRating(v: string | string[] | undefined): number | undefined` em `filters.ts` (só aceita 6, 7 ou 8; qualquer outra coisa → undefined). A Tarefa 8 reusa as duas.
+  - `formatRating(r: number): string | null` em `filters.ts` (`7.25` → `"7,3"`; `0` → `null`). Usada no MovieCard e no Hero.
+  - `withMinRating(filters: DiscoverFilters, minRating?: number): DiscoverFilters` em `discover.ts` (sem nota → devolve `filters` igual; com nota → `{ ...filters, minRating }`, mantendo `minVotes` da fileira).
+
+- [ ] **Step 1: Testes que falham:**
+```ts
+expect(parseRating('7')).toBe(7);
+expect(parseRating(['8', '6'])).toBe(8);           // usa o primeiro
+expect(parseRating(undefined)).toBeUndefined();
+expect(parseRating('abc')).toBeUndefined();
+expect(parseRating('99')).toBeUndefined();
+expect(parseRating('7.5')).toBeUndefined();
+expect(formatRating(7.25)).toBe('7,3'); expect(formatRating(8)).toBe('8,0'); expect(formatRating(0)).toBeNull();
+// withMinRating + buildDiscoverParams:
+//   em-alta com 7 → vote_average.gte 7, vote_count.gte 50
+//   bem-avaliados com 7 → vote_average.gte 7, vote_count.gte 300 (mantém o mínimo maior)
+//   sem nota → mesmos params de antes (sem vote_average.gte)
+```
+- [ ] **Step 2:** `npm test` → FAIL. Implemente. `npm test` → PASS.
+- [ ] **Step 3:** `page.tsx` recebe `searchParams` (é uma Promise nesta versão do Next: confira em `node_modules/next/dist/docs/`), lê `nota` com `parseRating` e passa `withMinRating(row.filters(today), nota)` para cada fileira. O destaque sai das fileiras filtradas. O título do Top 10 vira "Top 10 em alta nos seus streamings · nota 7+" quando há filtro. O `Suspense` usa `key={nota ?? 'todas'}` para mostrar o esqueleto ao trocar.
+- [ ] **Step 4:** `RatingFilter` (componente de servidor, sem JS): rótulo "Nota" e links "Todas" (`/`), "6+", "7+", "8+" (`/?nota=N`), com `aria-current="page"` e fundo amarelo no ativo. Fica logo abaixo do destaque, antes do Top 10. Se o filtro deixar todas as fileiras vazias: mostrar o `RatingFilter` e "Nenhum filme com nota N+ nos seus streamings. Tente uma nota menor." (sem destaque).
+- [ ] **Step 5:** `MovieCard`: "★ 7,3" no canto superior esquerdo do pôster (selo escuro translúcido, estrela amarela), via `formatRating`; sem selo quando `null`. `Hero` passa a usar `formatRating`.
+- [ ] **Step 6:** **Checkpoint:** ver as estrelas nos pôsteres; tocar em "7+", ver o endereço `/?nota=7` e só notas ≥ 7,0 nas fileiras; abrir `/?nota=abc` e ver a tela normal.
+- [ ] **Step 7:** Commit: `feat: nota nos pôsteres e filtro de nota na tela inicial`.
+
 ### Task 7: Detalhe do filme
 
 **Files:**
@@ -284,11 +319,12 @@ expect(parseSelection(serializeSelection({ services: [], includeFree: true })))
 ### Task 8: "O que eu assisto hoje?" e "Me surpreenda"
 
 **Files:**
-- Create: `src/lib/movies/filters.ts`, `src/components/FilterForm.tsx`, `src/components/MovieGrid.tsx`, `src/components/SurpriseButton.tsx`, `src/app/sugestoes/page.tsx`
+- Create: `src/components/FilterForm.tsx`, `src/components/MovieGrid.tsx`, `src/components/SurpriseButton.tsx`, `src/app/sugestoes/page.tsx`
 - Test: `tests/movies/filters.test.ts`
 
 **Interfaces:**
 - Consumes: `discoverMovies`, `MovieCard`, `getSelection`, `getServiceGroups`, gêneros de `/genre/movie/list` (revalidate 86400)
+- Modify: `src/lib/movies/filters.ts` (criado na Tarefa 6b; reuse `parseRating` para `nota`)
 - Produces: `parseFilterParams(sp: Record<string, string | string[] | undefined>): DiscoverFilters`, `pickRandom<T>(items: T[], rng?: () => number): T | undefined`.
 
 Os filtros ficam na URL (`/sugestoes?generos=35,10749&duracao=120&nota=7&desde=2015`), então dá para recarregar e compartilhar o link. Opções: duração {90: "Até 1h30", 120: "Até 2h", vazio: "Qualquer"}; nota {6, 7, 8, vazio}; época {2015, 2000, vazio: "Qualquer"} → `releasedFrom = 'AAAA-01-01'`.
@@ -312,7 +348,7 @@ expect(pickRandom(['a','b','c'], () => 0.99)).toBe('c');
 
 **Files:**
 - Create: `src/lib/movies/search.ts`, `src/app/busca/page.tsx`
-- Modify: `src/components/MovieCard.tsx` (estado "Não está nos seus streamings")
+- Modify: `src/components/Header.tsx` (a lupa vira o campo "Buscar filme")
 - Test: `tests/movies/search.test.ts`
 
 **Interfaces:**
@@ -330,7 +366,8 @@ expect(normalizeQuery('  ação & cia ')).toBe('ação & cia');
 ```
 - [ ] **Step 2:** FAIL, implemente, PASS.
 - [ ] **Step 3:** Página com um campo de busca (`<form method="get">`, `name="q"`, autofocus) e a grade de resultados. O MovieCard sem serviço mostra a etiqueta cinza "Não está nos seus streamings". Sem resultados: "Nenhum filme encontrado para "{q}"." Funciona mesmo sem seleção (todos os filmes aparecem como "Não está nos seus streamings").
-- [ ] **Step 4:** **Checkpoint:** buscar um filme que está num dos seus streamings e um que não está, e ver as duas etiquetas.
+- [ ] **Step 3b:** No `Header`, troque o link da lupa por `<form action="/busca" method="get" role="search">` (sem JS): ícone da lupa + `<input type="search" name="q" placeholder="Buscar filme" aria-label="Buscar filme">` + `<button type="submit" aria-label="Buscar">` (a lupa é o botão). Formato de pílula como o "Meus streamings". A 375px o campo fica estreito (~9rem) e "Meus streamings" mostra só o ícone (`sr-only` no texto abaixo de `sm`), sem rolagem horizontal. Busca vazia (`/busca?q=`) mostra só o campo, sem chamar o TMDB (`normalizeQuery`). O estado "Não está nos seus streamings" do MovieCard já existe.
+- [ ] **Step 4:** **Checkpoint:** digitar no campo do topo e apertar Enter (ou a lupa); buscar um filme que está num dos seus streamings e um que não está, e ver as duas etiquetas.
 - [ ] **Step 5:** Commit: `feat: busca por nome`.
 
 ### Task 10: Revisão final e publicação na Vercel
