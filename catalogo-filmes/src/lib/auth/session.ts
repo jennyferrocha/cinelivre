@@ -8,9 +8,16 @@ export type CurrentUser = { id: string; email: string };
 /** `unavailable`: o Supabase não respondeu (rede, erro 5xx, demora) — diferente de "ninguém logado". */
 export type SessionState = { user: CurrentUser | null; unavailable: boolean };
 
-/** Rede caiu, demorou demais ou o Supabase respondeu 5xx: é "fora do ar", não "deslogada". */
+/** Erros que significam "não está logada" (sem sessão, login inválido ou vencido). */
+const LOGGED_OUT_ERRORS = new Set(["AuthSessionMissingError", "AuthInvalidJwtError"]);
+
+/**
+ * Rede caiu, demorou demais, o Supabase respondeu 5xx ou algo inesperado (ex.: página de Wi-Fi
+ * público no lugar da resposta): é "fora do ar", não "deslogada".
+ */
 function isOutage(error: { name?: string; status?: number }): boolean {
-  return error.name === "AuthRetryableFetchError" || (error.status ?? 0) >= 500;
+  if (error.name && LOGGED_OUT_ERRORS.has(error.name)) return false;
+  return error.name === "AuthRetryableFetchError" || !error.status || error.status >= 500;
 }
 
 /**
@@ -26,6 +33,8 @@ export const getSessionState = cache(async function getSessionState(): Promise<S
     if (!supabase) return { user: null, unavailable: false };
     // getClaims confere a assinatura do login localmente (sem ir à rede) quando o projeto usa as
     // chaves de assinatura novas; nas antigas, consulta o Supabase como o getUser.
+    // Troca aceita: um "sair de todos os aparelhos" só vale aqui quando o login vence (~1h);
+    // o banco já se comportava assim, e o RLS continua garantindo que cada um só mexe no que é seu.
     const { data, error } = await supabase.auth.getClaims();
     if (error) return { user: null, unavailable: isOutage(error) };
     const claims = data?.claims;

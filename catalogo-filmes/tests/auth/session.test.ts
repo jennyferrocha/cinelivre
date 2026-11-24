@@ -68,4 +68,11 @@ describe("getCurrentUser", () => {
     createSupabaseServer.mockResolvedValue(clientWith(async () => { throw new Error("timeout"); }));
     expect(await getSessionState()).toEqual({ user: null, unavailable: true });
   });
+
+  it("resposta inesperada sem código (ex.: página de Wi-Fi público) é 'fora do ar'", async () => {
+    createSupabaseServer.mockResolvedValue(
+      clientWith(async () => ({ data: null, error: { name: "AuthUnknownError", message: "Unexpected token <" } })),
+    );
+    expect(await getSessionState()).toEqual({ user: null, unavailable: true });
+  });
 });
