@@ -9,6 +9,7 @@ import { MovieRow, MovieRowSkeleton, RankedRow } from "@/components/MovieRow";
 import { RatingFilter } from "@/components/RatingFilter";
 import { discoverMovies, HOME_ROWS, pickHero, withMinRating } from "@/lib/movies/discover";
 import { loadMarks } from "@/lib/marks/load";
+import { watchedIds } from "@/lib/marks/rules";
 import { withEnglishOverview } from "@/lib/movies/details";
 import { parseRating } from "@/lib/movies/filters";
 import { genreNames, getGenres } from "@/lib/movies/genres";
@@ -23,6 +24,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   const selection = await getSelection();
   if (!selection) redirect("/streamings");
   const marksState = await loadMarks();
+  const watched = watchedIds(marksState.marks); // o que a pessoa já viu sai das sugestões
 
   await connection(); // a data de hoje é calculada a cada pedido, não na pré-renderização
   const today = new Date();
@@ -30,7 +32,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   const rows = await Promise.all(
     HOME_ROWS.map(async (row) => ({
       ...row,
-      movies: await discoverMovies(selection, groups, withMinRating(row.filters(today), nota)),
+      movies: await discoverMovies(selection, groups, withMinRating(row.filters(today), nota), { excludeIds: watched }),
     })),
   );
 

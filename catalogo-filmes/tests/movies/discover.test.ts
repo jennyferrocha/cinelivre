@@ -244,3 +244,55 @@ describe("discoverMovies e attachServices (com TMDB simulado)", () => {
     expect(movies[0].services).toEqual([]);
   });
 });
+
+describe("discoverMovies sem os já assistidos (com TMDB simulado por página)", () => {
+  const fetchMock = vi.fn();
+  const pages: Record<number, number[]> = { 1: [1, 2, 3], 2: [4, 5], 3: [6], 4: [7], 5: [8] };
+  const discoverCalls = () => fetchMock.mock.calls.filter(([u]) => String(u).includes("/discover/movie")).length;
+
+  beforeEach(() => {
+    vi.stubGlobal("fetch", fetchMock);
+    vi.stubEnv("TMDB_TOKEN", "abc");
+    fetchMock.mockImplementation(async (url: string) => {
+      const json = (body: unknown) => new Response(JSON.stringify(body), { status: 200 });
+      if (url.includes("/discover/movie")) {
+        const page = Number(new URL(url).searchParams.get("page"));
+        return json({ page, total_pages: 5, total_results: 8, results: (pages[page] ?? []).map((id) => item({ id })) });
+      }
+      return json({ results: { BR: { flatrate: [{ provider_id: 8, provider_name: "Netflix", logo_path: "" }] } } });
+    });
+  });
+
+  afterEach(() => {
+    fetchMock.mockReset();
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  });
+
+  const selection = { services: ["netflix"], includeFree: false };
+
+  it("tira os já assistidos e completa com a página seguinte", async () => {
+    const movies = await discoverMovies(selection, groups, popular, { excludeIds: new Set([1, 2]), minResults: 2 });
+    expect(movies.map((m) => m.id)).toEqual([3, 4, 5]);
+  });
+
+  it("sem nada para esconder, faz um pedido só", async () => {
+    const movies = await discoverMovies(selection, groups, popular, { excludeIds: new Set() });
+    expect(movies.map((m) => m.id)).toEqual([1, 2, 3]);
+    expect(discoverCalls()).toBe(1);
+  });
+
+  it("se a pessoa já viu tudo, desiste depois de 3 páginas extras", async () => {
+    const movies = await discoverMovies(selection, groups, popular, {
+      excludeIds: new Set([1, 2, 3, 4, 5, 6, 7, 8]),
+      minResults: 8,
+    });
+    expect(movies).toEqual([]);
+    expect(discoverCalls()).toBe(4);
+  });
+
+  it("o filme já visto não vira destaque", async () => {
+    const movies = await discoverMovies(selection, groups, popular, { excludeIds: new Set([1]), minResults: 1 });
+    expect(pickHero(movies)?.id).not.toBe(1);
+  });
+});

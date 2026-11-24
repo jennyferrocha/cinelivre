@@ -151,21 +151,37 @@ export async function attachServices(
   return opts.keepUnavailable ? cards : cards.filter((c) => c.services.length > 0);
 }
 
-/** Lista de filmes do discover, só com o que a pessoa consegue assistir. */
+const MAX_EXTRA_PAGES = 3;
+const DEFAULT_MIN_RESULTS = 8;
+
+/**
+ * Lista de filmes do discover, só com o que a pessoa consegue assistir.
+ * `excludeIds` tira filmes (os que ela já assistiu); se a lista ficar com menos de
+ * `minResults`, busca as páginas seguintes (no máximo 3 a mais) para completar.
+ */
 export async function discoverMovies(
   selection: Selection,
   groups: ServiceGroup[],
   filters: DiscoverFilters,
-  opts: { pages?: number } = {},
+  opts: { pages?: number; excludeIds?: Set<number>; minResults?: number } = {},
 ): Promise<MovieCard[]> {
-  const pages = Array.from({ length: opts.pages ?? 1 }, (_, i) => i + 1);
-  const responses = await Promise.all(
-    pages.map((page) =>
-      tmdbFetch<TmdbPaged<TmdbMovieListItem>>(
-        "/discover/movie",
-        buildDiscoverParams(selection, groups, filters, page),
-      ),
-    ),
-  );
-  return attachServices(responses.flatMap((r) => r.results), selection, groups);
+  const exclude = opts.excludeIds ?? new Set<number>();
+  const minResults = opts.minResults ?? DEFAULT_MIN_RESULTS;
+  const fetchPage = (page: number) =>
+    tmdbFetch<TmdbPaged<TmdbMovieListItem>>("/discover/movie", buildDiscoverParams(selection, groups, filters, page));
+  const keep = (items: TmdbMovieListItem[]) => items.filter((item) => !exclude.has(item.id));
+
+  const firstPages = Array.from({ length: opts.pages ?? 1 }, (_, i) => i + 1);
+  const responses = await Promise.all(firstPages.map(fetchPage));
+  let movies = await attachServices(keep(responses.flatMap((r) => r.results)), selection, groups);
+
+  let page = firstPages.length;
+  const totalPages = Math.max(...responses.map((r) => r.total_pages ?? 1));
+  while (exclude.size > 0 && movies.length < minResults && page < firstPages.length + MAX_EXTRA_PAGES && page < totalPages) {
+    page += 1;
+    const extra = await attachServices(keep((await fetchPage(page)).results), selection, groups);
+    const seen = new Set(movies.map((m) => m.id));
+    movies = [...movies, ...extra.filter((m) => !seen.has(m.id))];
+  }
+  return movies;
 }

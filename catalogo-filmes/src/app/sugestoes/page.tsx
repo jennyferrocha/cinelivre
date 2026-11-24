@@ -7,6 +7,7 @@ import { MovieGrid } from "@/components/MovieGrid";
 import { MovieRowSkeleton } from "@/components/MovieRow";
 import { SurpriseButton } from "@/components/SurpriseButton";
 import { loadMarks } from "@/lib/marks/load";
+import { watchedIds } from "@/lib/marks/rules";
 import { discoverMovies } from "@/lib/movies/discover";
 import { parseFilterParams } from "@/lib/movies/filters";
 import { getGenres } from "@/lib/movies/genres";
@@ -25,10 +26,12 @@ async function Suggestions({ searchParams }: { searchParams: SearchParams }) {
   if (!selection) redirect("/streamings");
 
   const [groups, genres] = await Promise.all([getServiceGroups(), getGenres()]);
-  const [movies, marksState] = await Promise.all([
-    discoverMovies(selection, groups, filters, { pages: 3 }),
-    loadMarks(),
-  ]);
+  const marksState = await loadMarks();
+  // o que a pessoa já viu sai das sugestões e do "Me surpreenda"
+  const movies = await discoverMovies(selection, groups, filters, {
+    pages: 3,
+    excludeIds: watchedIds(marksState.marks),
+  });
 
   return (
     <MarksProvider enabled={marksState.enabled} loggedIn={marksState.loggedIn} initial={marksState.byId}>
