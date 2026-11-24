@@ -29,7 +29,7 @@ export function RankedRow({ title, movies }: { title: string; movies: MovieCardD
       <RowScroller label={title}>
         <ol className="flex gap-4 sm:gap-5">
           {top.map((movie, i) => (
-            <li key={movie.id} className="flex shrink-0 snap-start items-end">
+            <li key={movie.id} className="relative flex shrink-0 snap-start items-end">
               <span
                 aria-hidden
                 className="rank-numeral -mr-3 mb-11 translate-y-[0.06em] font-display text-[7.5rem] leading-[0.8] font-black tracking-tighter select-none sm:-mr-4 sm:text-[10.5rem]"

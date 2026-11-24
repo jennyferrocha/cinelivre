@@ -128,15 +128,26 @@ export async function attachServices(
   opts: { keepUnavailable?: boolean } = {},
 ): Promise<MovieCard[]> {
   const unique = items.filter((item, i) => items.findIndex((other) => other.id === item.id) === i);
+  let failures = 0;
+  let lastError: unknown;
   const cards = await mapWithConcurrency(unique, MAX_PARALLEL, async (item) => {
     if (!selection) return toMovieCard(item, []);
-    const providers = await tmdbFetch<TmdbWatchProvidersResponse>(
-      `/movie/${item.id}/watch/providers`,
-      {},
-      PROVIDERS_REVALIDATE,
-    );
-    return toMovieCard(item, availableServices(providers.results?.BR, selection, groups));
+    try {
+      const providers = await tmdbFetch<TmdbWatchProvidersResponse>(
+        `/movie/${item.id}/watch/providers`,
+        {},
+        PROVIDERS_REVALIDATE,
+      );
+      return toMovieCard(item, availableServices(providers.results?.BR, selection, groups));
+    } catch (error) {
+      // Uma consulta que falha esconde só esse filme (na dúvida, esconder).
+      failures++;
+      lastError = error;
+      return toMovieCard(item, []);
+    }
   });
+  // Se todas falharam, o TMDB está fora: deixa o erro chegar à página amigável.
+  if (unique.length > 0 && failures === unique.length) throw lastError;
   return opts.keepUnavailable ? cards : cards.filter((c) => c.services.length > 0);
 }
 

@@ -222,6 +222,23 @@ describe("discoverMovies e attachServices (com TMDB simulado)", () => {
     ]);
   });
 
+  it("se a consulta de streaming de um filme falhar, só esse filme some (na dúvida, esconder)", async () => {
+    const base = fetchMock.getMockImplementation()!;
+    fetchMock.mockImplementation(async (url: string) =>
+      url.includes("/movie/3/watch/providers") ? new Response("{}", { status: 429 }) : base(url),
+    );
+    const movies = await attachServices([item({ id: 1 }), item({ id: 3 })], selection, groups, { keepUnavailable: true });
+    expect(movies.map((m) => [m.id, m.services.length])).toEqual([
+      [1, 1],
+      [3, 0],
+    ]);
+  });
+
+  it("se todas as consultas falharem, o erro continua (TMDB fora do ar)", async () => {
+    fetchMock.mockImplementation(async () => new Response("{}", { status: 503 }));
+    await expect(attachServices([item({ id: 1 }), item({ id: 3 })], selection, groups)).rejects.toThrow();
+  });
+
   it("sem seleção, attachServices marca tudo como indisponível", async () => {
     const movies = await attachServices([item({ id: 1 })], null, groups, { keepUnavailable: true });
     expect(movies[0].services).toEqual([]);
