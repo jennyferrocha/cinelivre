@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Sora } from "next/font/google";
 import { AccountNotice } from "@/components/AccountNotice";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { Suspense } from "react";
 import "./globals.css";
 
 // Interface (botões, textos, etiquetas)
@@ -29,7 +30,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Header />
         {children}
         <Footer />
-        <AccountNotice />
+        <Suspense fallback={null}>
+          <AccountNotice />
+        </Suspense>
       </body>
     </html>
   );

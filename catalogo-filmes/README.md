@@ -27,6 +27,13 @@ Sem estas variáveis o app funciona normalmente, só sem login e listas.
    ⚠️ Nunca use a chave **secret / service_role**: ela ignora as regras de segurança.
 4. Reinicie o `npm run dev`.
 
+**Teste de segurança (opcional):** `npm run test:seguranca` cria duas contas descartáveis
+(`teste+rls...@example.com`) no seu projeto e confere que uma não lê nem altera os dados da outra.
+Depois, se quiser, apague essas contas em **Authentication → Users**.
+
+**Na Vercel:** adicione também `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+em Settings → Environment Variables e faça um novo deploy.
+
 ## Testes
 
 `npm test`
