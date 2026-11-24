@@ -1,16 +1,20 @@
 @import "tailwindcss";
 
-/* Cores do CineLivre: fundo quase preto e destaque amarelo. */
+/*
+ * CineLivre: o escuro aveludado de uma sala de cinema,
+ * iluminado pela luz quente do projetor.
+ */
 @theme inline {
-  --color-background: #111111;
-  --color-surface: #1d1d1d;
-  --color-surface-2: #262626;
-  --color-line: #333333;
-  --color-foreground: #ededed;
-  --color-muted: #a3a3a3;
-  --color-accent: #f5c518;
-  --color-accent-ink: #111111;
+  --color-background: #140c12; /* veludo da poltrona */
+  --color-surface: #22151e;
+  --color-surface-2: #2e1e29;
+  --color-line: #43303d;
+  --color-foreground: #f6eee6; /* papel da tela */
+  --color-muted: #b5a3ae;
+  --color-accent: #ffc56b; /* luz do projetor */
+  --color-accent-ink: #1a0f0a;
   --font-sans: var(--font-geist-sans);
+  --font-display: var(--font-big-shoulders);
 }
 
 html {
@@ -24,10 +28,69 @@ body {
   overflow-x: hidden;
 }
 
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
 /* Fileiras que deslizam para o lado sem barra de rolagem aparente */
 .no-scrollbar {
   scrollbar-width: none;
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/* Grão de película por cima da foto do destaque */
+.film-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.14;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Numeral vazado do Top 10 */
+.rank-numeral {
+  color: var(--color-background);
+  -webkit-text-stroke: 4px color-mix(in srgb, var(--color-foreground) 75%, transparent);
+  paint-order: stroke fill;
+}
+
+/* A única coreografia da página: a foto assenta e o texto sobe junto. */
+@keyframes hero-settle {
+  from {
+    transform: scale(1.09);
+    opacity: 0.4;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes hero-rise {
+  from {
+    transform: translateY(18px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+.hero-settle {
+  animation: hero-settle 2.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.hero-rise {
+  animation: hero-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(0.35s + var(--i, 0) * 0.09s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-settle,
+  .hero-rise {
+    animation: none;
+  }
 }

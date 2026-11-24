@@ -21,6 +21,7 @@ export type DiscoverFilters = {
 export type MovieCard = {
   id: number;
   title: string;
+  overview: string;
   year: string;
   posterUrl: string | null;
   backdropUrl: string | null;
@@ -96,6 +97,7 @@ export function toMovieCard(item: TmdbMovieListItem, services: ServiceLabel[]): 
   return {
     id: item.id,
     title: item.title,
+    overview: item.overview ?? "",
     year: item.release_date ? item.release_date.slice(0, 4) : "",
     posterUrl: imageUrl(item.poster_path, "w342"),
     backdropUrl: imageUrl(item.backdrop_path, "w1280"),

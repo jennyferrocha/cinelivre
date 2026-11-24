@@ -122,6 +122,7 @@ describe("toMovieCard", () => {
     expect(toMovieCard(item(), [])).toEqual({
       id: 1,
       title: "Filme",
+      overview: "",
       year: "2021",
       posterUrl: "https://image.tmdb.org/t/p/w342/p.jpg",
       backdropUrl: "https://image.tmdb.org/t/p/w1280/b.jpg",

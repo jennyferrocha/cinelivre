@@ -41,4 +41,16 @@ export type TmdbPaged<T> = {
   total_results: number;
 };
 
+export type TmdbImage = {
+  file_path: string;
+  aspect_ratio: number;
+  iso_639_1: string | null;
+  vote_average: number;
+};
+
+export type TmdbImagesResponse = {
+  id: number;
+  logos?: TmdbImage[];
+};
+
 export type TmdbGenre = { id: number; name: string };
