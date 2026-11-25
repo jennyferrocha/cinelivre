@@ -30,4 +30,29 @@ describe(`páginas em ${base}`, () => {
     expect(await page("/", NETFLIX)).not.toContain(BANNER);
     expect(await page("/sugestoes", NETFLIX)).not.toContain(BANNER);
   });
+
+  it("séries: a tela inicial troca para séries, com o botão e o Top 10", async () => {
+    const html = await page("/?tipo=series");
+    expect(html).toContain("Séries");
+    expect(html).toContain("Top 10 em alta");
+    expect(html).toContain('href="/serie/');
+    expect(html).toContain("Mostrando séries de todos os streamings.");
+    expect(await page("/?tipo=series&nota=8")).toContain('href="/?tipo=series&amp;nota=8"');
+  });
+
+  it("séries: página da série com temporadas", async () => {
+    const html = await page("/serie/1399");
+    expect(html).toContain("Game of Thrones");
+    expect(html).toContain("Especiais");
+    expect(await page("/serie/1399?temporada=2")).toContain('aria-label="Temporada 2"');
+  });
+
+  it("séries: série que não existe mostra 'não encontrada'", async () => {
+    expect(await page("/serie/999999999")).toContain("não encontrada");
+  });
+
+  it("busca acha filmes e séries", async () => {
+    const html = await page("/busca?q=the%20office");
+    expect(html).toContain('href="/serie/');
+  });
 });

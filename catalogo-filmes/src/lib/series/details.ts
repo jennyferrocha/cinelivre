@@ -156,3 +156,13 @@ export async function getSeason(id: number, n: number, today: Date): Promise<Epi
     status: episodeStatus(e.air_date, today),
   }));
 }
+
+/** "4 temporadas", para o destaque (a lista do TMDB não traz). Erro ou sem dado = null. */
+export async function getSeriesSeasonsLabel(id: number): Promise<string | null> {
+  try {
+    const data = await tmdbFetch<{ number_of_seasons: number }>(`/tv/${id}`, {}, DETAILS_REVALIDATE);
+    return seasonsLabel(data.number_of_seasons);
+  } catch {
+    return null;
+  }
+}

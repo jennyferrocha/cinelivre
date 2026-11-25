@@ -2,12 +2,29 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { KindSwitch } from "@/components/KindSwitch";
+import { parseKind, type HomeKind } from "@/lib/kind";
 import { HOME_TABS, parseTab, type HomeTab } from "@/lib/marks/tabs";
 
-/** Abas da tela inicial. A aba fica no endereço (`/?aba=quero`) para recarregar e compartilhar. */
+/**
+ * Topo da tela inicial: "Filmes | Séries" e, em filmes, as abas das listas.
+ * Tudo fica no endereço (`/?tipo=series`, `/?aba=quero`) para recarregar e compartilhar.
+ */
 export function HomeTabs() {
-  const active = parseTab(useSearchParams().get("aba") ?? undefined);
-  return <TabsNav active={active} />;
+  const params = useSearchParams();
+  return (
+    <HomeNav kind={parseKind(params.get("tipo") ?? undefined)} active={parseTab(params.get("aba") ?? undefined)} />
+  );
+}
+
+export function HomeNav({ kind, active }: { kind: HomeKind; active: HomeTab }) {
+  return (
+    <div className="flex flex-col gap-3">
+      <KindSwitch active={kind} />
+      {/* Listas de séries chegam na próxima etapa */}
+      {kind === "filmes" && <TabsNav active={active} />}
+    </div>
+  );
 }
 
 export function TabsNav({ active }: { active: HomeTab }) {

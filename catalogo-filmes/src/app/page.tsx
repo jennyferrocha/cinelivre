@@ -4,7 +4,7 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { AllStreamingsBanner } from "@/components/AllStreamingsBanner";
 import { Hero, HeroSkeleton } from "@/components/Hero";
-import { HomeTabs, TabsNav } from "@/components/HomeTabs";
+import { HomeNav, HomeTabs } from "@/components/HomeTabs";
 import { MarkedList } from "@/components/MarkedList";
 import { MarksProvider } from "@/components/MarksProvider";
 import { MovieRow, MovieRowSkeleton, RankedRow } from "@/components/MovieRow";
@@ -13,42 +13,52 @@ import { discoverMovies, HOME_ROWS, pickHero, withMinRating } from "@/lib/movies
 import { loadMarks } from "@/lib/marks/load";
 import { watchedIds } from "@/lib/marks/rules";
 import { parseTab } from "@/lib/marks/tabs";
+import { parseKind } from "@/lib/kind";
 import { getMovieRuntime, withEnglishOverview } from "@/lib/movies/details";
 import { parseRating } from "@/lib/movies/filters";
-import { genreNames, getGenres } from "@/lib/movies/genres";
+import { genreNames, getGenres, getTvGenres } from "@/lib/movies/genres";
 import { getMovieLogo } from "@/lib/movies/logo";
 import { getServiceGroups } from "@/lib/providers/service";
 import { getEffectiveSelection } from "@/lib/selection-server";
+import { getSeriesSeasonsLabel } from "@/lib/series/details";
+import { discoverSeries, SERIES_ROWS } from "@/lib/series/discover";
+import { cardHref } from "@/lib/titles";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   const sp = await searchParams;
+  const kind = parseKind(sp.tipo);
   const tab = parseTab(sp.aba);
   const nota = parseRating(sp.nota);
   // Sem escolha da pessoa, vale "todos os streamings" (chosen = false mostra o convite).
   const { selection, chosen } = await getEffectiveSelection();
 
   // Abas "Quero assistir" / "Já assisti": funcionam mesmo sem streamings escolhidos.
-  if (tab !== "para-voce") {
+  // Listas de séries chegam na próxima etapa: em séries, `aba` é ignorada.
+  if (kind === "filmes" && tab !== "para-voce") {
     const [marksState, groups] = await Promise.all([loadMarks(), getServiceGroups()]);
     return (
-      <div className="pt-32 pb-8">
+      <div className="pt-44 pb-8">
         <MarkedList status={tab} marksState={marksState} selection={selection} chosen={chosen} groups={groups} />
       </div>
     );
   }
 
   const marksState = await loadMarks();
-  const watched = watchedIds(marksState.marks); // o que a pessoa já viu sai das sugestões
+  // O que a pessoa já viu sai das sugestões (por enquanto só filmes têm marcação).
+  const watched = kind === "filmes" ? watchedIds(marksState.marks) : undefined;
+  const isSeries = kind === "series";
+  const noun = isSeries ? "série" : "filme";
 
   await connection(); // a data de hoje é calculada a cada pedido, não na pré-renderização
   const today = new Date();
-  const [groups, genres] = await Promise.all([getServiceGroups(), getGenres()]);
+  const [groups, genres] = await Promise.all([getServiceGroups(), isSeries ? getTvGenres() : getGenres()]);
+  const discover = isSeries ? discoverSeries : discoverMovies;
   const rows = await Promise.all(
-    HOME_ROWS.map(async (row) => ({
+    (isSeries ? SERIES_ROWS : HOME_ROWS).map(async (row) => ({
       ...row,
-      movies: await discoverMovies(selection, groups, withMinRating(row.filters(today), nota), { excludeIds: watched }),
+      movies: await discover(selection, groups, withMinRating(row.filters(today), nota), { excludeIds: watched }),
     })),
   );
 
@@ -56,15 +66,17 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   if (!hero && nota) {
     return (
       <div className="flex flex-col items-center gap-5 px-4 pt-40 pb-24 text-center">
-        <p className="text-lg">Nenhum filme com nota {nota}+ nos seus streamings. Tente uma nota menor.</p>
-        <RatingFilter active={nota} />
+        <p className="text-lg">
+          Nenhum{isSeries ? "a" : ""} {noun} com nota {nota}+ nos seus streamings. Tente uma nota menor.
+        </p>
+        <RatingFilter active={nota} kind={kind} />
       </div>
     );
   }
   if (!hero) {
     return (
       <div className="flex flex-col items-center gap-3 px-4 pt-40 pb-24 text-center">
-        <p className="text-lg">Não achamos filmes nos seus streamings agora.</p>
+        <p className="text-lg">Não achamos {noun}s nos seus streamings agora.</p>
         <Link href="/streamings" className="rounded-md bg-surface-2 px-4 py-2 text-sm hover:bg-line">
           Mudar meus streamings
         </Link>
@@ -73,9 +85,9 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   }
 
   const [heroMovie, logo, runtime] = await Promise.all([
-    withEnglishOverview(hero),
-    getMovieLogo(hero.id),
-    getMovieRuntime(hero.id),
+    isSeries ? hero : withEnglishOverview(hero),
+    getMovieLogo(hero.id, hero.kind),
+    isSeries ? getSeriesSeasonsLabel(hero.id) : getMovieRuntime(hero.id),
   ]);
   const [trending, ...others] = rows;
   const rank = trending.movies.indexOf(hero) + 1 || null;
@@ -88,12 +100,14 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
           movie={heroMovie}
           genre={genreNames(hero.genreIds, genres)[0] ?? null}
           runtime={runtime}
+          href={cardHref(hero)}
+          showSurprise={!isSeries}
           logo={logo}
           rank={rank}
         />
         <div className="relative z-10 -mt-28 flex flex-col gap-8 sm:-mt-36">
-          {!chosen && <AllStreamingsBanner />}
-          <RatingFilter active={nota} />
+          {!chosen && <AllStreamingsBanner what={isSeries ? "séries" : "filmes"} />}
+          <RatingFilter active={nota} kind={kind} />
           <RankedRow
             title={`Top 10 em alta nos seus streamings${nota ? ` · nota ${nota}+` : ""}`}
             movies={trending.movies}
@@ -146,7 +160,7 @@ export default function HomePage({ searchParams }: { searchParams: SearchParams 
     <main className="relative -mt-16 flex flex-col">
       {/* Abas logo abaixo do topo, por cima da foto do destaque */}
       <div className="absolute inset-x-0 top-16 z-20">
-        <Suspense fallback={<TabsNav active="para-voce" />}>
+        <Suspense fallback={<HomeNav kind="filmes" active="para-voce" />}>
           <HomeTabs />
         </Suspense>
       </div>

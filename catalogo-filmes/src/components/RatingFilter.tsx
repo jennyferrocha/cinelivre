@@ -1,11 +1,12 @@
 import Link from "next/link";
+import { homeHref, type HomeKind } from "@/lib/kind";
 import { RATING_OPTIONS } from "@/lib/movies/filters";
 
-/** Botões "Todas / 6+ / 7+ / 8+" da tela inicial. A escolha vai para a URL (`/?nota=7`). */
-export function RatingFilter({ active }: { active: number | undefined }) {
+/** Botões "Todas / 6+ / 7+ / 8+" da tela inicial. A escolha vai para a URL (`/?nota=7`, `/?tipo=series&nota=7`). */
+export function RatingFilter({ active, kind = "filmes" }: { active: number | undefined; kind?: HomeKind }) {
   const options = [
-    { label: "Todas", href: "/", value: undefined },
-    ...RATING_OPTIONS.map((n) => ({ label: `${n}+`, href: `/?nota=${n}`, value: n })),
+    { label: "Todas", href: homeHref(kind), value: undefined },
+    ...RATING_OPTIONS.map((n) => ({ label: `${n}+`, href: homeHref(kind, n), value: n })),
   ];
   return (
     <nav aria-label="Filtrar por nota" className="flex items-center gap-2 px-4 sm:px-10">

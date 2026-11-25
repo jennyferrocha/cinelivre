@@ -11,8 +11,12 @@ Dados: [TMDB](https://www.themoviedb.org/) e JustWatch.
   **nota mínima** (6+, 7+, 8+).
 - **"O que eu assisto hoje?"**: filtros de gênero, duração, nota e época, mais o botão
   **"Me surpreenda"**, que sorteia um filme.
-- **Busca por nome**, mostrando onde cada filme está (ou "Não está nos seus streamings").
+- **Séries**: o botão **"Filmes | Séries"** no topo da tela inicial troca para séries dos seus
+  streamings, com destaque, Top 10 e fileiras por gênero.
+- **Busca por nome** de filmes e séries, mostrando onde cada um está (ou "Não está nos seus streamings").
 - **Página do filme** com sinopse, nota, duração, classificação, trailer, elenco e onde assistir.
+- **Página da série** com resumo, temporadas (T1, T2… e Especiais), episódios com data de estreia
+  e onde assistir.
 - **Conta opcional** (e-mail e senha) para:
   - marcar filmes como **"Quero assistir"** ou **"Já assisti"**, nos pôsteres ou na página do filme;
   - ver essas listas nas **abas da tela inicial**;

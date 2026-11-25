@@ -9,8 +9,12 @@ import type { MovieLogo } from "@/lib/movies/logo";
 type Props = {
   movie: MovieCard;
   genre: string | null;
-  /** "2h05", ou null quando o TMDB não informa. */
+  /** "2h05" (filme) ou "4 temporadas" (série); null quando o TMDB não informa. */
   runtime: string | null;
+  /** Página do título ("/filme/1" ou "/serie/1"). */
+  href: string;
+  /** Mostra o botão "O que eu assisto hoje?" (só na parte de filmes). */
+  showSurprise: boolean;
   logo: MovieLogo | null;
   /** Posição no "Em alta" (1 = mais popular), quando o filme veio de lá. */
   rank: number | null;
@@ -19,7 +23,7 @@ type Props = {
 const rise = (i: number) => ({ "--i": i }) as CSSProperties;
 
 /** Filme em destaque no topo da tela inicial: foto grande, arte do título e onde assistir. */
-export function Hero({ movie, genre, runtime, logo, rank }: Props) {
+export function Hero({ movie, genre, runtime, href, showSurprise, logo, rank }: Props) {
   return (
     <section className="relative isolate flex min-h-[82svh] items-end overflow-hidden sm:min-h-[92svh]">
       {/* Foto: assenta devagar e se dissolve na sala no pé da tela */}
@@ -39,7 +43,7 @@ export function Hero({ movie, genre, runtime, logo, rank }: Props) {
         <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_85%_10%,transparent_40%,color-mix(in_srgb,var(--color-background)_55%,transparent))]" />
       </div>
 
-      <div className="flex w-full max-w-2xl flex-col items-start gap-5 px-4 pt-32 pb-36 sm:px-10 sm:pb-44">
+      <div className="flex w-full max-w-2xl flex-col items-start gap-5 px-4 pt-44 pb-36 sm:px-10 sm:pb-44">
         {rank && (
           <p className="hero-rise flex items-center gap-3" style={rise(0)}>
             <span className="font-display text-5xl leading-none font-black text-accent">{rank}º</span>
@@ -100,19 +104,21 @@ export function Hero({ movie, genre, runtime, logo, rank }: Props) {
 
         <div className="hero-rise mt-1 flex flex-wrap gap-3" style={rise(4)}>
           <Link
-            href={`/filme/${movie.id}`}
+            href={href}
             className="flex items-center gap-2 rounded-md bg-foreground px-6 py-3 font-bold text-accent-ink transition-colors hover:bg-accent"
           >
             <InfoIcon />
             Ver detalhes
           </Link>
-          <Link
-            href="/sugestoes"
-            className="flex items-center gap-2 rounded-md bg-foreground/15 px-6 py-3 font-semibold backdrop-blur-md transition-colors hover:bg-foreground/25"
-          >
-            <DiceIcon />
-            O que eu assisto hoje?
-          </Link>
+          {showSurprise && (
+            <Link
+              href="/sugestoes"
+              className="flex items-center gap-2 rounded-md bg-foreground/15 px-6 py-3 font-semibold backdrop-blur-md transition-colors hover:bg-foreground/25"
+            >
+              <DiceIcon />
+              O que eu assisto hoje?
+            </Link>
+          )}
         </div>
       </div>
     </section>
