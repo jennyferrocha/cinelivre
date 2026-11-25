@@ -29,12 +29,13 @@ async function withServices(marks: Mark[], status: MarkStatus, selection: Select
   const byId = new Map(marks.map((m) => [m.movieId, m]));
   try {
     // Mantém todos (keepUnavailable): quem saiu dos streamings aparece com o texto de "fora dos streamings".
-    return await attachServices(
+    const cards = await attachServices(
       asListItems(ordered.map((c) => byId.get(c.id)!)),
       selection,
       groups,
       { keepUnavailable: true },
     );
+    return cards.map((c) => ({ ...c, stars: byId.get(c.id)?.stars ?? null }));
   } catch {
     return ordered; // TMDB fora do ar: a lista aparece, só sem as etiquetas
   }

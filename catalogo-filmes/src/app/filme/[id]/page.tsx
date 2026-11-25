@@ -6,6 +6,7 @@ import { StarIcon } from "@/components/Icons";
 import { WhereToWatchList } from "@/components/WhereToWatchList";
 import { MarksProvider } from "@/components/MarksProvider";
 import { MarkToggle } from "@/components/MarkToggle";
+import { MovieStars } from "@/components/MovieStars";
 import { formatRating } from "@/lib/movies/filters";
 import { loadMarks } from "@/lib/marks/load";
 import { snapshotFromCard } from "@/lib/marks/rules";
@@ -134,6 +135,10 @@ async function MovieContent({ params }: Props) {
               </a>
             )}
             <MarkToggle movie={snapshotFromCard(movie)} variant="detail" />
+            <MovieStars
+              movie={snapshotFromCard(movie)}
+              initial={marksState.marks.find((m) => m.movieId === movie.id)?.stars ?? null}
+            />
 
             <WhereToWatchList services={movie.allServicesBR} />
 

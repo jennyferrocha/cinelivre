@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { StarIcon } from "@/components/Icons";
 import { MarkToggle, WatchedBadge } from "@/components/MarkToggle";
+import { StarsLine } from "@/components/StarRating";
 import { snapshotFromCard } from "@/lib/marks/rules";
 import type { MovieCard as MovieCardData } from "@/lib/movies/discover";
 import { formatRating, unavailableLabel } from "@/lib/movies/filters";
@@ -58,11 +59,12 @@ export function MovieCard({
           )}
           {!isSeries && <WatchedBadge movieId={movie.id} />}
         </div>
-        <span className="mt-2 flex h-9 flex-col">
+        <span className={`mt-2 flex flex-col ${movie.stars ? "h-[3.25rem]" : "h-9"}`}>
           <span className="truncate text-[13px] leading-tight font-semibold text-foreground/95 transition-colors group-hover:text-accent">
             {movie.title}
           </span>
           {movie.year ? <span className="mt-0.5 text-xs leading-tight text-muted">{movie.year}</span> : null}
+          {movie.stars ? <StarsLine stars={movie.stars} /> : null}
         </span>
       </Link>
       {isSeries ? (
