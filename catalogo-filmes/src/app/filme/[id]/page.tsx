@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { StarIcon } from "@/components/Icons";
+import { WhereToWatchList } from "@/components/WhereToWatchList";
 import { MarksProvider } from "@/components/MarksProvider";
 import { MarkToggle } from "@/components/MarkToggle";
 import { formatRating } from "@/lib/movies/filters";
@@ -11,23 +12,15 @@ import { snapshotFromCard } from "@/lib/marks/rules";
 import { getMovieDetails } from "@/lib/movies/details";
 import { getServiceGroups } from "@/lib/providers/service";
 import { getSelection } from "@/lib/selection-server";
+import { certificationLabel, parseId } from "@/lib/titles";
 
 type Props = { params: Promise<{ id: string }> };
-
-function parseId(raw: string): number | null {
-  return /^\d{1,10}$/.test(raw) && Number(raw) > 0 ? Number(raw) : null;
-}
 
 async function load(raw: string) {
   const id = parseId(raw);
   if (!id) return null;
   const [selection, groups] = await Promise.all([getSelection(), getServiceGroups()]);
   return getMovieDetails(id, selection, groups);
-}
-
-/** "L" → "Livre", "14" → "14 anos". */
-function certificationLabel(cert: string): string {
-  return cert === "L" ? "Livre" : /^\d+$/.test(cert) ? `${cert} anos` : cert;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -142,40 +135,7 @@ async function MovieContent({ params }: Props) {
             )}
             <MarkToggle movie={snapshotFromCard(movie)} variant="detail" />
 
-            <section aria-labelledby="onde-assistir" className="flex flex-col gap-3 pt-2">
-              <h2 id="onde-assistir" className="font-display text-xl font-bold">
-                Onde assistir
-              </h2>
-              {movie.allServicesBR.length > 0 ? (
-                <ul className="flex flex-wrap gap-2">
-                  {movie.allServicesBR.map((s) => (
-                    <li
-                      key={s.key}
-                      className={`flex items-center gap-2 rounded-full py-1 pr-3.5 pl-1 text-sm font-medium ${
-                        s.mine ? "bg-accent text-background" : "bg-surface-2 text-foreground/55"
-                      }`}
-                    >
-                      {s.logoUrl ? (
-                        <Image
-                          src={s.logoUrl}
-                          alt=""
-                          width={26}
-                          height={26}
-                          className={`rounded-full ${s.mine ? "" : "opacity-60 grayscale"}`}
-                        />
-                      ) : (
-                        <span className="w-1" />
-                      )}
-                      {s.name}
-                      {s.mine && <span className="sr-only"> (você assina)</span>}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-muted">Não está em nenhum streaming no Brasil agora.</p>
-              )}
-              <p className="text-xs text-muted">Dados de streaming: JustWatch</p>
-            </section>
+            <WhereToWatchList services={movie.allServicesBR} />
 
             {movie.cast.length > 0 && (
               <p className="text-sm text-foreground/85">
