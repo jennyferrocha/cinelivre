@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Sora } from "next/font/google";
 import { AccountNotice } from "@/components/AccountNotice";
+import { NavigationTrail } from "@/components/NavigationTrail";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Suspense } from "react";
@@ -32,6 +33,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Footer />
         <Suspense fallback={null}>
           <AccountNotice />
+        </Suspense>
+        <Suspense fallback={null}>
+          <NavigationTrail />
         </Suspense>
       </body>
     </html>

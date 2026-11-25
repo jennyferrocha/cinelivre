@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { EpisodeList } from "@/components/EpisodeList";
+import { BackLink } from "@/components/BackLink";
 import { StarIcon } from "@/components/Icons";
 import { SeasonPicker } from "@/components/SeasonPicker";
 import { SeriesTrackingProvider, TrackerControls } from "@/components/SeriesTracking";
@@ -89,7 +90,11 @@ async function SeriesContent({ params, searchParams }: Props) {
   ].filter(Boolean);
 
   return (
-    <main className="-mt-16">
+    <main className="relative -mt-16">
+      {/* Seta logo abaixo do topo, por cima da foto */}
+      <div className="absolute inset-x-0 top-16 z-20 px-4 sm:px-10">
+        <BackLink kind="tv" />
+      </div>
       <div className="relative h-[52vh] min-h-72 w-full sm:h-[62vh]">
         {series.backdropUrl && (
           <Image src={series.backdropUrl} alt="" fill priority sizes="100vw" className="object-cover object-top" />

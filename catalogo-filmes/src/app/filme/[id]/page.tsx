@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { BackLink } from "@/components/BackLink";
 import { StarIcon } from "@/components/Icons";
 import { WhereToWatchList } from "@/components/WhereToWatchList";
 import { MarksProvider } from "@/components/MarksProvider";
@@ -69,7 +70,11 @@ async function MovieContent({ params }: Props) {
 
   return (
     <MarksProvider enabled={marksState.enabled} loggedIn={marksState.loggedIn} initial={marksState.byId}>
-      <main className="-mt-16">
+      <main className="relative -mt-16">
+      {/* Seta logo abaixo do topo, por cima da foto */}
+      <div className="absolute inset-x-0 top-16 z-20 px-4 sm:px-10">
+        <BackLink kind="movie" />
+      </div>
         <div className="relative h-[52vh] min-h-72 w-full sm:h-[62vh]">
           {movie.backdropUrl && (
             <Image src={movie.backdropUrl} alt="" fill priority sizes="100vw" className="object-cover object-top" />
