@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useTransition, type ComponentType } from "react";
+import type { ComponentType } from "react";
 import { BookmarkIcon, CheckIcon } from "@/components/Icons";
 import { useMarks } from "@/components/MarksProvider";
 import { toggleMark } from "@/lib/marks/actions";
@@ -22,7 +22,6 @@ export function MarkToggle({ movie, variant }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const search = useSearchParams().toString();
-  const [, startTransition] = useTransition();
   if (!marks) return null;
 
   const current = marks.statusOf(movie.movieId);
@@ -31,15 +30,15 @@ export function MarkToggle({ movie, variant }: Props) {
     `/entrar?${new URLSearchParams({ next: here, marcar: `${movie.movieId}:${status}` })}`;
 
   const onClick = (status: MarkStatus) => {
-    startTransition(() =>
-      runToggle(movie, status, current, {
-        toggle: toggleMark,
-        setStatus: marks.setStatus,
-        onLogin: (clicked) => router.push(loginHref(clicked)),
-        onError: marks.showError,
-        busy: marks.busy,
-      }),
-    );
+    // Fora de transição: numa transição assíncrona o React só mostra o ✓ quando o servidor
+    // responde. Assim ele aparece na hora (e é desfeito se der errado).
+    void runToggle(movie, status, current, {
+      toggle: toggleMark,
+      setStatus: marks.setStatus,
+      onLogin: (clicked) => router.push(loginHref(clicked)),
+      onError: marks.showError,
+      busy: marks.busy,
+    });
   };
 
   if (variant === "detail") {
