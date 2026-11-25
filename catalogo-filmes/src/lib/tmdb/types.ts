@@ -34,6 +34,17 @@ export type TmdbMovieListItem = {
   overview: string;
 };
 
+export type TmdbTvListItem = {
+  id: number;
+  name: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  vote_average: number;
+  first_air_date: string;
+  genre_ids: number[];
+  overview: string;
+};
+
 export type TmdbPaged<T> = {
   page: number;
   results: T[];

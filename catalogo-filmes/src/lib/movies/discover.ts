@@ -28,11 +28,35 @@ export type MovieCard = {
   rating: number;
   genreIds: number[];
   services: ServiceLabel[];
+  /** "tv" = série; ausente = filme. */
+  kind?: "tv";
 };
 
 const MAX_PARALLEL = 10;
 const PROVIDERS_REVALIDATE = 21600; // 6 horas
 const DEFAULT_MIN_VOTES_WITH_RATING = 50;
+
+/** Os parâmetros de streaming (região, serviços, tipo de oferta) para o discover. */
+export function providerParams(selection: Selection, groups: ServiceGroup[]): Record<string, string> {
+  const paidIds = groups
+    .filter((g) => selection.services.includes(g.key))
+    .flatMap((g) => g.providerIds);
+  const providerIds = [...paidIds, ...(selection.includeFree ? FREE_PROVIDER_IDS : [])];
+  return {
+    watch_region: "BR",
+    with_watch_providers: providerIds.join("|"),
+    with_watch_monetization_types: selection.includeFree ? "flatrate|free|ads" : "flatrate|ads",
+  };
+}
+
+/** Nota mínima e mínimo de votos (com nota e sem mínimo, 50 votos). */
+export function ratingParams(filters: DiscoverFilters): Record<string, number> {
+  const params: Record<string, number> = {};
+  if (filters.minRating) params["vote_average.gte"] = filters.minRating;
+  const minVotes = filters.minVotes ?? (filters.minRating ? DEFAULT_MIN_VOTES_WITH_RATING : undefined);
+  if (minVotes) params["vote_count.gte"] = minVotes;
+  return params;
+}
 
 /** Monta os parâmetros do /discover/movie para a seleção e os filtros da pessoa. */
 export function buildDiscoverParams(
@@ -41,24 +65,15 @@ export function buildDiscoverParams(
   filters: DiscoverFilters,
   page: number,
 ): Record<string, string | number> {
-  const paidIds = groups
-    .filter((g) => selection.services.includes(g.key))
-    .flatMap((g) => g.providerIds);
-  const providerIds = [...paidIds, ...(selection.includeFree ? FREE_PROVIDER_IDS : [])];
-
   const params: Record<string, string | number> = {
-    watch_region: "BR",
-    with_watch_providers: providerIds.join("|"),
-    with_watch_monetization_types: selection.includeFree ? "flatrate|free|ads" : "flatrate|ads",
+    ...providerParams(selection, groups),
     sort_by: filters.sortBy,
     include_adult: "false",
     page,
   };
   if (filters.genres?.length) params.with_genres = filters.genres.join("|");
   if (filters.maxRuntime) params["with_runtime.lte"] = filters.maxRuntime;
-  if (filters.minRating) params["vote_average.gte"] = filters.minRating;
-  const minVotes = filters.minVotes ?? (filters.minRating ? DEFAULT_MIN_VOTES_WITH_RATING : undefined);
-  if (minVotes) params["vote_count.gte"] = minVotes;
+  Object.assign(params, ratingParams(filters));
   if (filters.releasedFrom) params["primary_release_date.gte"] = filters.releasedFrom;
   if (filters.releasedTo) params["primary_release_date.lte"] = filters.releasedTo;
   return params;
@@ -69,7 +84,7 @@ export function withMinRating(filters: DiscoverFilters, minRating?: number): Dis
   return minRating ? { ...filters, minRating } : filters;
 }
 
-function isoDate(date: Date): string {
+export function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
@@ -117,33 +132,41 @@ export function pickHero(movies: MovieCard[]): MovieCard | null {
   return movies.find((m) => m.backdropUrl) ?? null;
 }
 
+/** Como conferir onde assistir e montar o cartão, para filmes ou séries. */
+export type CardSource<T> = {
+  providersPath: (id: number) => string;
+  toCard: (item: T, services: ServiceLabel[]) => MovieCard;
+};
+
+const MOVIE_SOURCE: CardSource<TmdbMovieListItem> = {
+  providersPath: (id) => `/movie/${id}/watch/providers`,
+  toCard: toMovieCard,
+};
+
 /**
- * Confere, filme por filme, em quais streamings da pessoa ele está.
+ * Confere, título por título, em quais streamings da pessoa ele está.
  * Sem `keepUnavailable`, descarta quem não está em nenhum.
  */
-export async function attachServices(
-  items: TmdbMovieListItem[],
+export async function attachServicesBy<T extends { id: number }>(
+  items: T[],
   selection: Selection | null,
   groups: ServiceGroup[],
+  how: CardSource<T>,
   opts: { keepUnavailable?: boolean } = {},
 ): Promise<MovieCard[]> {
   const unique = items.filter((item, i) => items.findIndex((other) => other.id === item.id) === i);
   let failures = 0;
   let lastError: unknown;
   const cards = await mapWithConcurrency(unique, MAX_PARALLEL, async (item) => {
-    if (!selection) return toMovieCard(item, []);
+    if (!selection) return how.toCard(item, []);
     try {
-      const providers = await tmdbFetch<TmdbWatchProvidersResponse>(
-        `/movie/${item.id}/watch/providers`,
-        {},
-        PROVIDERS_REVALIDATE,
-      );
-      return toMovieCard(item, availableServices(providers.results?.BR, selection, groups));
+      const providers = await tmdbFetch<TmdbWatchProvidersResponse>(how.providersPath(item.id), {}, PROVIDERS_REVALIDATE);
+      return how.toCard(item, availableServices(providers.results?.BR, selection, groups));
     } catch (error) {
-      // Uma consulta que falha esconde só esse filme (na dúvida, esconder).
+      // Uma consulta que falha esconde só esse título (na dúvida, esconder).
       failures++;
       lastError = error;
-      return toMovieCard(item, []);
+      return how.toCard(item, []);
     }
   });
   // Se todas falharam, o TMDB está fora: deixa o erro chegar à página amigável.
@@ -151,37 +174,68 @@ export async function attachServices(
   return opts.keepUnavailable ? cards : cards.filter((c) => c.services.length > 0);
 }
 
+/** Filmes: confere em quais streamings da pessoa cada um está. */
+export function attachServices(
+  items: TmdbMovieListItem[],
+  selection: Selection | null,
+  groups: ServiceGroup[],
+  opts: { keepUnavailable?: boolean } = {},
+): Promise<MovieCard[]> {
+  return attachServicesBy(items, selection, groups, MOVIE_SOURCE, opts);
+}
+
 const MAX_EXTRA_PAGES = 3;
 const DEFAULT_MIN_RESULTS = 8;
 
+export type DiscoverOptions = { pages?: number; excludeIds?: Set<number>; minResults?: number };
+
 /**
- * Lista de filmes do discover, só com o que a pessoa consegue assistir.
- * `excludeIds` tira filmes (os que ela já assistiu); se a lista ficar com menos de
+ * Lista do discover (`path`), só com o que a pessoa consegue assistir.
+ * `excludeIds` tira títulos (os que ela já assistiu); se a lista ficar com menos de
  * `minResults`, busca as páginas seguintes (no máximo 3 a mais) para completar.
  */
-export async function discoverMovies(
+export async function discoverBy<T extends { id: number }>(
+  path: string,
+  params: (page: number) => Record<string, string | number>,
+  how: CardSource<T>,
   selection: Selection,
   groups: ServiceGroup[],
-  filters: DiscoverFilters,
-  opts: { pages?: number; excludeIds?: Set<number>; minResults?: number } = {},
+  opts: DiscoverOptions = {},
 ): Promise<MovieCard[]> {
   const exclude = opts.excludeIds ?? new Set<number>();
   const minResults = opts.minResults ?? DEFAULT_MIN_RESULTS;
-  const fetchPage = (page: number) =>
-    tmdbFetch<TmdbPaged<TmdbMovieListItem>>("/discover/movie", buildDiscoverParams(selection, groups, filters, page));
-  const keep = (items: TmdbMovieListItem[]) => items.filter((item) => !exclude.has(item.id));
+  const fetchPage = (page: number) => tmdbFetch<TmdbPaged<T>>(path, params(page));
+  const keep = (items: T[]) => items.filter((item) => !exclude.has(item.id));
+  const attach = (items: T[]) => attachServicesBy(keep(items), selection, groups, how);
 
   const firstPages = Array.from({ length: opts.pages ?? 1 }, (_, i) => i + 1);
   const responses = await Promise.all(firstPages.map(fetchPage));
-  let movies = await attachServices(keep(responses.flatMap((r) => r.results)), selection, groups);
+  let cards = await attach(responses.flatMap((r) => r.results));
 
   let page = firstPages.length;
   const totalPages = Math.max(...responses.map((r) => r.total_pages ?? 1));
-  while (exclude.size > 0 && movies.length < minResults && page < firstPages.length + MAX_EXTRA_PAGES && page < totalPages) {
+  while (exclude.size > 0 && cards.length < minResults && page < firstPages.length + MAX_EXTRA_PAGES && page < totalPages) {
     page += 1;
-    const extra = await attachServices(keep((await fetchPage(page)).results), selection, groups);
-    const seen = new Set(movies.map((m) => m.id));
-    movies = [...movies, ...extra.filter((m) => !seen.has(m.id))];
+    const extra = await attach((await fetchPage(page)).results);
+    const seen = new Set(cards.map((m) => m.id));
+    cards = [...cards, ...extra.filter((m) => !seen.has(m.id))];
   }
-  return movies;
+  return cards;
+}
+
+/** Lista de filmes do discover, só com o que a pessoa consegue assistir. */
+export function discoverMovies(
+  selection: Selection,
+  groups: ServiceGroup[],
+  filters: DiscoverFilters,
+  opts: DiscoverOptions = {},
+): Promise<MovieCard[]> {
+  return discoverBy(
+    "/discover/movie",
+    (page) => buildDiscoverParams(selection, groups, filters, page),
+    MOVIE_SOURCE,
+    selection,
+    groups,
+    opts,
+  );
 }

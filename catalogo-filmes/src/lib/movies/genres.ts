@@ -8,6 +8,12 @@ export async function getGenres(): Promise<TmdbGenre[]> {
   return data.genres;
 }
 
+/** Lista de gêneros de série em português (são outros números que os de filme). */
+export async function getTvGenres(): Promise<TmdbGenre[]> {
+  const data = await tmdbFetch<{ genres: TmdbGenre[] }>("/genre/tv/list", {}, 86400);
+  return data.genres;
+}
+
 export function genreNames(ids: number[], all: TmdbGenre[]): string[] {
   return ids.flatMap((id) => all.find((g) => g.id === id)?.name ?? []);
 }
