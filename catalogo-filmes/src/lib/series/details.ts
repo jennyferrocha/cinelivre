@@ -5,6 +5,7 @@ import { availableServices } from "@/lib/providers/availability";
 import type { ServiceGroup } from "@/lib/providers/grouping";
 import type { Selection } from "@/lib/selection";
 import { toSeriesCard } from "@/lib/series/discover";
+import type { SeriesShape } from "@/lib/series/progress";
 import { imageUrl, tmdbFetch, TmdbError } from "@/lib/tmdb/client";
 import type { TmdbSeason, TmdbTvDetails } from "@/lib/tmdb/types";
 
@@ -35,6 +36,8 @@ export type SeriesDetails = MovieCard & {
   allServicesBR: WhereToWatch[];
   /** T1, T2… e "Especiais" por último. Temporadas sem episódios ficam de fora. */
   seasons: SeasonSummary[];
+  /** Para calcular progresso e situação (ver `progress.ts`). */
+  shape: SeriesShape;
 };
 
 /** "2011–2019", "2020" (começou e terminou no mesmo ano) ou "Desde 2019" (continua). */
@@ -89,6 +92,28 @@ function toSeasons(raw: TmdbTvDetails["seasons"]): SeasonSummary[] {
   return [...regular, ...specials];
 }
 
+function toShape(data: TmdbTvDetails): SeriesShape {
+  const last = data.last_episode_to_air;
+  return {
+    seasons: (data.seasons ?? [])
+      .filter((s) => s.season_number > 0 && s.episode_count > 0)
+      .sort((a, b) => a.season_number - b.season_number)
+      .map((s) => ({ number: s.season_number, episodeCount: s.episode_count })),
+    lastAired: last ? { season: last.season_number, episode: last.episode_number } : null,
+    finished: FINISHED.has(data.status),
+    nextAirDate: data.next_episode_to_air?.air_date ?? null,
+  };
+}
+
+/** O formato da série (temporadas, último exibido, se terminou). Erro ou série inexistente = null. */
+export async function getSeriesShape(id: number): Promise<SeriesShape | null> {
+  try {
+    return toShape(await tmdbFetch<TmdbTvDetails>(`/tv/${id}`, {}, DETAILS_REVALIDATE));
+  } catch {
+    return null;
+  }
+}
+
 /** Resumo em inglês, para quando o TMDB não tem o em português. */
 async function englishOverview(id: number): Promise<string> {
   try {
@@ -135,6 +160,7 @@ export async function getSeriesDetails(
     cast: (data.aggregate_credits?.cast ?? []).slice(0, MAX_CAST).map((c) => c.name),
     allServicesBR: whereToWatch(offers, new Set(services.map((s) => s.key)), groups),
     seasons: toSeasons(data.seasons),
+    shape: toShape(data),
   };
 }
 
@@ -159,10 +185,6 @@ export async function getSeason(id: number, n: number, today: Date): Promise<Epi
 
 /** "4 temporadas", para o destaque (a lista do TMDB não traz). Erro ou sem dado = null. */
 export async function getSeriesSeasonsLabel(id: number): Promise<string | null> {
-  try {
-    const data = await tmdbFetch<{ number_of_seasons: number }>(`/tv/${id}`, {}, DETAILS_REVALIDATE);
-    return seasonsLabel(data.number_of_seasons);
-  } catch {
-    return null;
-  }
+  const shape = await getSeriesShape(id);
+  return shape ? seasonsLabel(shape.seasons.length) : null;
 }

@@ -82,6 +82,8 @@ export type TmdbMovieDetails = Omit<TmdbMovieListItem, "genre_ids"> & {
   "watch/providers"?: TmdbWatchProvidersResponse;
 };
 
+export type TmdbEpisodeRef = { season_number: number; episode_number: number; air_date: string | null };
+
 /** /tv/{id} com append_to_response=videos,aggregate_credits,content_ratings,watch/providers */
 export type TmdbTvDetails = Omit<TmdbTvListItem, "genre_ids"> & {
   last_air_date: string | null;
@@ -90,6 +92,8 @@ export type TmdbTvDetails = Omit<TmdbTvListItem, "genre_ids"> & {
   number_of_seasons: number;
   genres: TmdbGenre[];
   seasons: { season_number: number; name: string; episode_count: number }[];
+  last_episode_to_air?: TmdbEpisodeRef | null;
+  next_episode_to_air?: TmdbEpisodeRef | null;
   videos?: { results: TmdbVideo[] };
   aggregate_credits?: { cast: { name: string }[] };
   content_ratings?: { results: { iso_3166_1: string; rating: string }[] };

@@ -6,6 +6,7 @@ import {
   formatYears,
   getSeason,
   getSeriesDetails,
+  getSeriesShape,
   pickSeason,
   seasonsLabel,
   type SeasonSummary,
@@ -94,6 +95,8 @@ describe("getSeriesDetails e getSeason (com TMDB simulado)", () => {
     last_air_date: "2024-05-01",
     status: "Ended",
     number_of_seasons: 2,
+    last_episode_to_air: { season_number: 2, episode_number: 8, air_date: "2024-05-01" },
+    next_episode_to_air: null,
     genres: [{ id: 18, name: "Drama" }],
     seasons: [
       { season_number: 0, name: "Especiais", episode_count: 2 },
@@ -153,6 +156,21 @@ describe("getSeriesDetails e getSeason (com TMDB simulado)", () => {
     expect(d!.allServicesBR).toEqual([
       { key: "netflix", name: "Netflix", logoUrl: "https://image.tmdb.org/t/p/w92/n.png", mine: true },
     ]);
+  });
+
+  it("traz o formato da série para calcular o progresso", async () => {
+    const d = await getSeriesDetails(10, sel, groups);
+    expect(d!.shape).toEqual({
+      seasons: [
+        { number: 1, episodeCount: 10 },
+        { number: 2, episodeCount: 8 },
+      ],
+      lastAired: { season: 2, episode: 8 },
+      finished: true,
+      nextAirDate: null,
+    });
+    expect(await getSeriesShape(10)).toEqual(d!.shape);
+    expect(await getSeriesShape(99)).toBeNull();
   });
 
   it("série que não existe = null", async () => {
