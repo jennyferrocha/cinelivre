@@ -70,13 +70,19 @@ export function episodeStatus(airDate: string | null, today: Date): EpisodeStatu
   return { aired: false, label: `Estreia ${d}/${m}/${y}` };
 }
 
-/** A temporada pedida na URL, se existe; senão a primeira da lista (T1, ou Especiais se só houver eles). */
-export function pickSeason(raw: string | string[] | undefined, seasons: SeasonSummary[]): number | null {
+/**
+ * A temporada pedida na URL, se existe; senão a `preferred` (onde a pessoa parou), se existe;
+ * senão a primeira da lista (T1, ou Especiais se só houver eles).
+ */
+export function pickSeason(
+  raw: string | string[] | undefined,
+  seasons: SeasonSummary[],
+  preferred?: number,
+): number | null {
+  const has = (n: number) => seasons.some((s) => s.number === n);
   const value = Array.isArray(raw) ? raw[0] : raw;
-  if (value && /^\d{1,3}$/.test(value)) {
-    const n = Number(value);
-    if (seasons.some((s) => s.number === n)) return n;
-  }
+  if (value && /^\d{1,3}$/.test(value) && has(Number(value))) return Number(value);
+  if (preferred !== undefined && has(preferred)) return preferred;
   return seasons[0]?.number ?? null;
 }
 

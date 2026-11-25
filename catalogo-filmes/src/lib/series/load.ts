@@ -1,6 +1,7 @@
 import "server-only";
 import { getCurrentUser } from "@/lib/auth/session";
-import { getSeriesMarks, type EpisodeMark, type SeriesMark } from "@/lib/series/store";
+import type { EpisodeRef } from "@/lib/series/progress";
+import { getSeriesMarks, getSeriesTracking, type EpisodeMark, type SeriesMark } from "@/lib/series/store";
 import { supabaseConfig } from "@/lib/supabase/config";
 
 export type SeriesMarksState = {
@@ -24,4 +25,27 @@ export function trackedSeriesIds(state: Pick<SeriesMarksState, "series" | "episo
   const ids = new Set(state.episodes.filter((e) => e.season > 0).map((e) => e.seriesId));
   for (const s of state.series) if (s.stopped) ids.add(s.seriesId);
   return ids;
+}
+
+/** O acompanhamento de uma série (página da série). Lê a sessão: chamar dentro de um <Suspense>. */
+export async function loadSeriesTracking(seriesId: number): Promise<{
+  enabled: boolean;
+  loggedIn: boolean;
+  initial: { want: boolean; stopped: boolean; stars: number | null; watched: EpisodeRef[] };
+}> {
+  const empty = { want: false, stopped: false, stars: null, watched: [] };
+  if (!supabaseConfig()) return { enabled: false, loggedIn: false, initial: empty };
+  const user = await getCurrentUser();
+  if (!user) return { enabled: true, loggedIn: false, initial: empty };
+  const { mark, episodes } = await getSeriesTracking(user.id, seriesId);
+  return {
+    enabled: true,
+    loggedIn: true,
+    initial: {
+      want: mark?.want ?? false,
+      stopped: mark?.stopped ?? false,
+      stars: mark?.stars ?? null,
+      watched: episodes.map((e) => ({ season: e.season, episode: e.episode })),
+    },
+  };
 }

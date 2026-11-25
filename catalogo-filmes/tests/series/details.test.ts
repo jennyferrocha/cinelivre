@@ -65,6 +65,13 @@ describe("pickSeason", () => {
   it("valor inválido abre a primeira temporada", () => {
     for (const bad of [undefined, "", "abc", "-1", "99", "1.5"]) expect(pickSeason(bad, s)).toBe(1);
   });
+  it("sem temporada na URL, abre a preferida (onde a pessoa parou) se existir", () => {
+    expect(pickSeason(undefined, s, 2)).toBe(2);
+    expect(pickSeason(undefined, s, 7)).toBe(1);
+    expect(pickSeason("1", s, 2)).toBe(1);
+    expect(pickSeason("abc", s, 2)).toBe(2);
+  });
+
   it("só especiais: abre os especiais; nenhuma: null", () => {
     expect(pickSeason(undefined, [{ number: 0, label: "Especiais", episodeCount: 2 }])).toBe(0);
     expect(pickSeason(undefined, [])).toBeNull();

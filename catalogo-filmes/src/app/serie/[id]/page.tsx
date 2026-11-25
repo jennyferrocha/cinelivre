@@ -6,11 +6,15 @@ import { Suspense } from "react";
 import { EpisodeList } from "@/components/EpisodeList";
 import { StarIcon } from "@/components/Icons";
 import { SeasonPicker } from "@/components/SeasonPicker";
+import { SeriesTrackingProvider, TrackerControls } from "@/components/SeriesTracking";
 import { WhereToWatchList } from "@/components/WhereToWatchList";
 import { formatRating } from "@/lib/movies/filters";
 import { getServiceGroups } from "@/lib/providers/service";
 import { getSelection } from "@/lib/selection-server";
 import { getSeason, getSeriesDetails, pickSeason } from "@/lib/series/details";
+import { loadSeriesTracking } from "@/lib/series/load";
+import { seriesProgress } from "@/lib/series/progress";
+import { seriesSnapshotFromCard } from "@/lib/series/validate";
 import { certificationLabel, parseId } from "@/lib/titles";
 
 type Props = {
@@ -69,6 +73,13 @@ async function SeriesContent({ params, searchParams }: Props) {
   const series = await load((await params).id);
   if (!series) notFound();
 
+  const tracking = await loadSeriesTracking(series.id);
+  const { watched } = tracking.initial;
+  // Abre na temporada do próximo episódio (ou do último marcado), se a URL não pedir outra.
+  const lastWatched = [...watched].filter((e) => e.season > 0).sort((a, b) => b.season - a.season || b.episode - a.episode)[0];
+  const preferred = seriesProgress(series.shape, watched).next?.season ?? lastWatched?.season;
+  const active = pickSeason((await searchParams).temporada, series.seasons, watched.length > 0 ? preferred : undefined);
+
   const rating = formatRating(series.rating);
   const facts = [
     series.years,
@@ -103,6 +114,13 @@ async function SeriesContent({ params, searchParams }: Props) {
           )}
         </div>
 
+        <SeriesTrackingProvider
+          enabled={tracking.enabled}
+          loggedIn={tracking.loggedIn}
+          series={seriesSnapshotFromCard(series)}
+          shape={series.shape}
+          initial={tracking.initial}
+        >
         <div className="flex min-w-0 flex-1 flex-col gap-4 sm:pt-28">
           <h1 className="font-display text-3xl leading-tight font-extrabold text-balance sm:text-4xl">{series.title}</h1>
 
@@ -141,6 +159,8 @@ async function SeriesContent({ params, searchParams }: Props) {
             </a>
           )}
 
+          <TrackerControls />
+
           <WhereToWatchList services={series.allServicesBR} />
 
           {series.cast.length > 0 && (
@@ -155,10 +175,11 @@ async function SeriesContent({ params, searchParams }: Props) {
               Episódios
             </h2>
             <Suspense fallback={<EpisodesSkeleton />}>
-              <Episodes series={series} searchParams={searchParams} />
+              <Episodes series={series} active={active} />
             </Suspense>
           </section>
         </div>
+        </SeriesTrackingProvider>
       </div>
     </main>
   );
@@ -166,12 +187,11 @@ async function SeriesContent({ params, searchParams }: Props) {
 
 async function Episodes({
   series,
-  searchParams,
+  active,
 }: {
   series: { id: number; seasons: Parameters<typeof pickSeason>[1] };
-  searchParams: Props["searchParams"];
+  active: number | null;
 }) {
-  const active = pickSeason((await searchParams).temporada, series.seasons);
   if (active === null) return <p className="text-muted">Ainda não há episódios.</p>;
 
   await connection(); // "já exibido" depende da data de hoje, calculada a cada pedido
@@ -186,7 +206,7 @@ async function Episodes({
     <>
       <SeasonPicker seriesId={series.id} seasons={series.seasons} active={active} />
       {episodes ? (
-        <EpisodeList episodes={episodes} />
+        <EpisodeList season={active} episodes={episodes} />
       ) : (
         <p className="text-muted">Não foi possível carregar os episódios.</p>
       )}
