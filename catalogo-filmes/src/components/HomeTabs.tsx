@@ -4,36 +4,39 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { KindSwitch } from "@/components/KindSwitch";
 import { parseKind, type HomeKind } from "@/lib/kind";
-import { HOME_TABS, parseTab, type HomeTab } from "@/lib/marks/tabs";
+import { HOME_TABS, parseSeriesTab, parseTab, SERIES_TABS } from "@/lib/marks/tabs";
 
 /**
- * Topo da tela inicial: "Filmes | Séries" e, em filmes, as abas das listas.
+ * Topo da tela inicial: "Filmes | Séries" e as abas das listas de cada parte.
  * Tudo fica no endereço (`/?tipo=series`, `/?aba=quero`) para recarregar e compartilhar.
  */
 export function HomeTabs() {
   const params = useSearchParams();
   return (
-    <HomeNav kind={parseKind(params.get("tipo") ?? undefined)} active={parseTab(params.get("aba") ?? undefined)} />
+    <HomeNav kind={parseKind(params.get("tipo") ?? undefined)} tab={params.get("aba") ?? undefined} />
   );
 }
 
-export function HomeNav({ kind, active }: { kind: HomeKind; active: HomeTab }) {
+export function HomeNav({ kind, tab }: { kind: HomeKind; tab?: string }) {
   return (
     <div className="flex flex-col gap-3">
       <KindSwitch active={kind} />
-      {/* Listas de séries chegam na próxima etapa */}
-      {kind === "filmes" && <TabsNav active={active} />}
+      {kind === "series" ? (
+        <TabsNav tabs={SERIES_TABS} active={parseSeriesTab(tab)} />
+      ) : (
+        <TabsNav tabs={HOME_TABS} active={parseTab(tab)} />
+      )}
     </div>
   );
 }
 
-export function TabsNav({ active }: { active: HomeTab }) {
+function TabsNav({ tabs, active }: { tabs: { id: string; label: string; href: string }[]; active: string }) {
   return (
     <nav
       aria-label="Listas"
       className="flex gap-5 overflow-x-auto px-4 text-sm font-semibold [text-shadow:0_1px_10px_rgba(0,0,0,0.85)] sm:gap-7 sm:px-10"
     >
-      {HOME_TABS.map((tab) => {
+      {tabs.map((tab) => {
         const isActive = tab.id === active;
         return (
           <Link

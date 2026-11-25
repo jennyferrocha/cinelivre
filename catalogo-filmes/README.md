@@ -21,9 +21,13 @@ Dados: [TMDB](https://www.themoviedb.org/) e JustWatch.
   - marcar filmes como **"Quero assistir"** ou **"Já assisti"**, nos pôsteres ou na página do filme;
   - ver essas listas nas **abas da tela inicial**;
   - **tirar das sugestões** o que você já assistiu;
-  - levar a **escolha de streamings** para qualquer aparelho em que você entrar.
+  - levar a **escolha de streamings** para qualquer aparelho em que você entrar;
+  - **acompanhar séries**: marcar episódios (com "marcar os anteriores", a temporada ou a série
+    inteira), ver o próximo episódio em **"Continuar assistindo"** e as abas de séries
+    (**Quero assistir, Acompanhando, Já assisti, Parei de assistir**);
+  - dar **de 1 a 5 estrelas** para filmes e séries.
 
-Sem conta, tudo funciona, exceto marcar filmes.
+Sem conta, tudo funciona, exceto marcar filmes, episódios e dar estrelas.
 
 ## Tecnologias
 

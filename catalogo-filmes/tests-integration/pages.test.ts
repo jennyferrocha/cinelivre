@@ -59,4 +59,12 @@ describe(`páginas em ${base}`, () => {
     const html = await page("/busca?q=the%20office");
     expect(html).toContain('href="/serie/');
   });
+
+  it("séries: abas de listas pedem login para quem não entrou", async () => {
+    for (const aba of ["quero", "acompanhando", "assisti", "parei"]) {
+      const html = await page(`/?tipo=series&aba=${aba}`);
+      expect(html).toContain("Entre para acompanhar suas séries");
+      expect(html).toContain('href="/?tipo=series&amp;aba=parei"');
+    }
+  });
 });

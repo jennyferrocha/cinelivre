@@ -3,16 +3,18 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { AllStreamingsBanner } from "@/components/AllStreamingsBanner";
+import { ContinueRow } from "@/components/ContinueRow";
 import { Hero, HeroSkeleton } from "@/components/Hero";
 import { HomeNav, HomeTabs } from "@/components/HomeTabs";
 import { MarkedList } from "@/components/MarkedList";
 import { MarksProvider } from "@/components/MarksProvider";
 import { MovieRow, MovieRowSkeleton, RankedRow } from "@/components/MovieRow";
 import { RatingFilter } from "@/components/RatingFilter";
+import { SeriesList } from "@/components/SeriesList";
 import { discoverMovies, HOME_ROWS, pickHero, withMinRating } from "@/lib/movies/discover";
 import { loadMarks } from "@/lib/marks/load";
 import { watchedIds } from "@/lib/marks/rules";
-import { parseTab } from "@/lib/marks/tabs";
+import { parseSeriesTab, parseTab } from "@/lib/marks/tabs";
 import { parseKind } from "@/lib/kind";
 import { getMovieRuntime, withEnglishOverview } from "@/lib/movies/details";
 import { parseRating } from "@/lib/movies/filters";
@@ -22,6 +24,9 @@ import { getServiceGroups } from "@/lib/providers/service";
 import { getEffectiveSelection } from "@/lib/selection-server";
 import { getSeriesSeasonsLabel } from "@/lib/series/details";
 import { discoverSeries, SERIES_ROWS } from "@/lib/series/discover";
+import { continueWatching } from "@/lib/series/lists";
+import { loadTrackedSeries } from "@/lib/series/lists-server";
+import { loadSeriesMarks, trackedSeriesIds } from "@/lib/series/load";
 import { cardHref } from "@/lib/titles";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -34,8 +39,16 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
   // Sem escolha da pessoa, vale "todos os streamings" (chosen = false mostra o convite).
   const { selection, chosen } = await getEffectiveSelection();
 
-  // Abas "Quero assistir" / "Já assisti": funcionam mesmo sem streamings escolhidos.
-  // Listas de séries chegam na próxima etapa: em séries, `aba` é ignorada.
+  // Abas de listas: funcionam mesmo sem streamings escolhidos.
+  const seriesTab = parseSeriesTab(sp.aba);
+  if (kind === "series" && seriesTab !== "para-voce") {
+    const [seriesState, groups] = await Promise.all([loadSeriesMarks(), getServiceGroups()]);
+    return (
+      <div className="pt-44 pb-8">
+        <SeriesList situation={seriesTab} state={seriesState} selection={selection} chosen={chosen} groups={groups} />
+      </div>
+    );
+  }
   if (kind === "filmes" && tab !== "para-voce") {
     const [marksState, groups] = await Promise.all([loadMarks(), getServiceGroups()]);
     return (
@@ -45,10 +58,15 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
     );
   }
 
-  const marksState = await loadMarks();
-  // O que a pessoa já viu sai das sugestões (por enquanto só filmes têm marcação).
-  const watched = kind === "filmes" ? watchedIds(marksState.marks) : undefined;
   const isSeries = kind === "series";
+  const [marksState, seriesState] = await Promise.all([
+    loadMarks(),
+    isSeries ? loadSeriesMarks() : Promise.resolve(null),
+  ]);
+  // O que a pessoa já viu (filmes) ou já está vendo (séries) sai das sugestões.
+  const watched = seriesState ? trackedSeriesIds(seriesState) : watchedIds(marksState.marks);
+  const continuing =
+    seriesState?.loggedIn && seriesState.series.length > 0 ? continueWatching(await loadTrackedSeries(seriesState)) : [];
   const noun = isSeries ? "série" : "filme";
 
   await connection(); // a data de hoje é calculada a cada pedido, não na pré-renderização
@@ -106,6 +124,7 @@ async function HomeContent({ searchParams }: { searchParams: SearchParams }) {
           rank={rank}
         />
         <div className="relative z-10 -mt-28 flex flex-col gap-8 sm:-mt-36">
+          <ContinueRow items={continuing} />
           {!chosen && <AllStreamingsBanner what={isSeries ? "séries" : "filmes"} />}
           <RatingFilter active={nota} kind={kind} />
           <RankedRow
@@ -160,7 +179,7 @@ export default function HomePage({ searchParams }: { searchParams: SearchParams 
     <main className="relative -mt-16 flex flex-col">
       {/* Abas logo abaixo do topo, por cima da foto do destaque */}
       <div className="absolute inset-x-0 top-16 z-20">
-        <Suspense fallback={<HomeNav kind="filmes" active="para-voce" />}>
+        <Suspense fallback={<HomeNav kind="filmes" />}>
           <HomeTabs />
         </Suspense>
       </div>
