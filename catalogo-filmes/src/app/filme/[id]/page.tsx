@@ -72,7 +72,7 @@ async function MovieContent({ params }: Props) {
     <MarksProvider enabled={marksState.enabled} loggedIn={marksState.loggedIn} initial={marksState.byId}>
       <main className="relative -mt-16">
       {/* Seta logo abaixo do topo, por cima da foto */}
-      <div className="absolute inset-x-0 top-16 z-20 px-4 sm:px-10">
+      <div className="pointer-events-none absolute inset-x-0 top-16 z-20 px-4 sm:px-10">
         <BackLink kind="movie" />
       </div>
         <div className="relative h-[52vh] min-h-72 w-full sm:h-[62vh]">

@@ -92,7 +92,7 @@ async function SeriesContent({ params, searchParams }: Props) {
   return (
     <main className="relative -mt-16">
       {/* Seta logo abaixo do topo, por cima da foto */}
-      <div className="absolute inset-x-0 top-16 z-20 px-4 sm:px-10">
+      <div className="pointer-events-none absolute inset-x-0 top-16 z-20 px-4 sm:px-10">
         <BackLink kind="tv" />
       </div>
       <div className="relative h-[52vh] min-h-72 w-full sm:h-[62vh]">

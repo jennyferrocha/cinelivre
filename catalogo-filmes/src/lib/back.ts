@@ -1,38 +1,61 @@
-// Regra da seta "← Voltar": volta para a tela anterior se ela for do próprio CineLivre
-// (guardada na sessão do navegador); senão, vai para Séries ou Filmes.
+// Regra da seta "← Voltar". Guarda na sessão do navegador a trilha de páginas que a pessoa
+// abriu dentro do CineLivre nesta aba, espelhando o histórico (o voltar do navegador tira a
+// última). A seta volta pelo histórico até a tela anterior de verdade, pulando outras
+// temporadas da mesma página e a tela de login. Sem tela anterior no app, vai para Séries/Filmes.
 
-export type Trail = { last?: string; prev?: string };
+export type Stack = string[];
 
-export const TRAIL_KEY = "cinelivre-trilha";
+export const STACK_KEY = "cinelivre-trilha";
+const MAX = 30;
 
-/** Nova página: a atual vira a anterior. Mesma página (recarregar): nada muda. */
-export function nextTrail(trail: Trail, current: string): Trail {
-  if (trail.last === current) return trail;
-  return { last: current, prev: trail.last };
+const pathOf = (url: string) => url.split("?")[0];
+
+/**
+ * Página carregada do zero. Recarregar mantém a trilha; abrir a aba, um link ou voltar de
+ * outro site começa uma nova (não dá para saber o que há antes no histórico).
+ */
+export function onLoad(stack: Stack, current: string, navType: string): Stack {
+  return navType === "reload" && stack.at(-1) === current ? stack : [current];
 }
 
-/** Dá para voltar com o "voltar" do navegador sem sair do app? */
-export function canGoBack(trail: Trail, current: string): boolean {
-  return !!trail.prev && trail.prev !== current && trail.last === current;
+/** Troca de página dentro do app. `pop` = veio do voltar/avançar do navegador. */
+export function onNavigate(stack: Stack, current: string, pop: boolean): Stack {
+  if (stack.at(-1) === current) return stack;
+  if (pop) {
+    // Voltou (uma ou várias páginas): a trilha encolhe até a página de chegada.
+    const i = stack.lastIndexOf(current);
+    if (i >= 0) return stack.slice(0, i + 1);
+  }
+  return [...stack, current].slice(-MAX);
 }
 
-export function readTrail(storage: Pick<Storage, "getItem"> | null): Trail {
+/**
+ * Quantas páginas voltar no histórico para chegar à tela anterior (outra página, que não seja
+ * o login). null = não há tela anterior do app (a seta usa o destino padrão).
+ */
+export function backSteps(stack: Stack, current: string): number | null {
+  if (stack.at(-1) !== current) return null; // trilha desatualizada: não confia
+  for (let i = stack.length - 2; i >= 0; i--) {
+    const path = pathOf(stack[i]);
+    if (path === pathOf(current) || path === "/entrar") continue;
+    return stack.length - 1 - i;
+  }
+  return null;
+}
+
+export function readStack(storage: Pick<Storage, "getItem"> | null): Stack {
   try {
-    const raw = storage?.getItem(TRAIL_KEY);
-    if (!raw) return {};
-    const data = JSON.parse(raw) as Trail;
-    return {
-      ...(typeof data.last === "string" ? { last: data.last } : {}),
-      ...(typeof data.prev === "string" ? { prev: data.prev } : {}),
-    };
+    const raw = storage?.getItem(STACK_KEY);
+    const data: unknown = raw ? JSON.parse(raw) : [];
+    return Array.isArray(data) ? data.filter((x): x is string => typeof x === "string") : [];
   } catch {
-    return {};
+    return [];
   }
 }
 
-export function writeTrail(storage: Pick<Storage, "setItem"> | null, trail: Trail): void {
+export function writeStack(storage: Pick<Storage, "setItem"> | null, stack: Stack): void {
   try {
-    storage?.setItem(TRAIL_KEY, JSON.stringify(trail));
+    storage?.setItem(STACK_KEY, JSON.stringify(stack));
   } catch {
     // sem sessionStorage: a seta usa o destino padrão
   }
