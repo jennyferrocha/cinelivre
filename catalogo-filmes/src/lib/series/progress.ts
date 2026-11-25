@@ -31,10 +31,12 @@ const isRegular = (e: EpisodeRef) => e.season > 0;
 export function airedEpisodes(shape: SeriesShape): EpisodeRef[] {
   const last = shape.lastAired;
   if (!last) return [];
+  // O último exibido pode ser um especial (temporada 0): aí as temporadas regulares já saíram todas.
+  const lastSeason = last.season === 0 ? Infinity : last.season;
   const result: EpisodeRef[] = [];
   for (const s of [...shape.seasons].filter((x) => x.number > 0).sort((a, b) => a.number - b.number)) {
-    if (s.number > last.season) break;
-    const upTo = s.number === last.season ? Math.min(last.episode, s.episodeCount || last.episode) : s.episodeCount;
+    if (s.number > lastSeason) break;
+    const upTo = s.number === lastSeason ? Math.min(last.episode, s.episodeCount || last.episode) : s.episodeCount;
     for (let ep = 1; ep <= upTo; ep++) result.push({ season: s.number, episode: ep });
   }
   return result;
@@ -96,4 +98,18 @@ export function progressLabel(
   return shape.nextAirDate && /^\d{4}-\d{2}-\d{2}$/.test(shape.nextAirDate)
     ? `Em dia · novo episódio em ${brDate(shape.nextAirDate)}`
     : "Em dia";
+}
+
+/**
+ * O episódio pode ser marcado? Regular: só se já saiu segundo o TMDB (a mesma regra que o
+ * servidor confere). Especial: pela data do próprio episódio.
+ */
+export function canMark(shape: SeriesShape, e: EpisodeRef, airedByDate: boolean): boolean {
+  if (!isRegular(e)) return airedByDate;
+  return airedEpisodes(shape).some((a) => a.season === e.season && a.episode === e.episode);
+}
+
+/** A página adota o estado que veio do servidor só quando nada está sendo salvo (senão some o que acabou de marcar). */
+export function adoptServerState(seen: string, signature: string, pending: number): boolean {
+  return signature !== seen && pending === 0;
 }

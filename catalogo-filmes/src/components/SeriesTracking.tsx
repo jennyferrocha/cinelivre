@@ -10,14 +10,15 @@ import {
   useMemo,
   useRef,
   useState,
-  useTransition,
   type ReactNode,
 } from "react";
 import { StarRating } from "@/components/StarRating";
 import { setEpisodes, setSeriesFlag, setSeriesStars } from "@/lib/series/actions";
 import { runEpisodeChange } from "@/lib/series/episode-flow";
 import {
+  adoptServerState,
   airedEpisodes,
+  canMark,
   episodeKey,
   previousUnwatched,
   progressLabel,
@@ -76,7 +77,6 @@ export function SeriesTrackingProvider({
   const pathname = usePathname();
   const search = useSearchParams().toString();
   const here = search ? `${pathname}?${search}` : pathname;
-  const [, startTransition] = useTransition();
 
   const [watched, setWatched] = useState(() => new Set(initial.watched.map(episodeKey)));
   const [want, setWant] = useState(initial.want);
@@ -84,11 +84,14 @@ export function SeriesTrackingProvider({
   const [error, setError] = useState(false);
   const [askPrevious, setAskPrevious] = useState<EpisodeRef[] | null>(null);
   const busy = useRef(new Set<string>());
+  /** Quantas marcações ainda estão sendo salvas. */
+  const [pending, setPending] = useState(0);
 
-  // O servidor pode mandar outro estado (ex.: depois de entrar na conta): ele passa a valer.
+  // O servidor pode mandar outro estado (ex.: depois de entrar na conta): ele passa a valer,
+  // mas só quando nada está sendo salvo (senão some da tela o que acabou de ser marcado).
   const signature = JSON.stringify(initial);
   const [seen, setSeen] = useState(signature);
-  if (signature !== seen) {
+  if (adoptServerState(seen, signature, pending)) {
     setSeen(signature);
     setWatched(new Set(initial.watched.map(episodeKey)));
     setWant(initial.want);
@@ -126,8 +129,11 @@ export function SeriesTrackingProvider({
       setAskPrevious(null);
     }
     if (on) setStopped(false); // marcar um episódio tira de "Parei de assistir"
-    startTransition(() =>
-      runEpisodeChange(list, on, {
+    setPending((n) => n + 1);
+    // Fora de transição: a mudança aparece na hora, sem esperar o servidor responder.
+    void (async () => {
+      try {
+        await runEpisodeChange(list, on, {
         save: async (l, w) => {
           const r = await setEpisodes(series, l, w);
           return "ok" in r ? "ok" : r.error;
@@ -142,14 +148,17 @@ export function SeriesTrackingProvider({
           setError(true);
         },
         busy: busy.current,
-      }),
-    );
+        });
+      } finally {
+        setPending((n) => n - 1);
+      }
+    })();
   };
 
   const toggleFlag = (flag: "want" | "stopped") => {
     const [current, set] = flag === "want" ? [want, setWant] : [stopped, setStopped];
     set(!current);
-    startTransition(async () => {
+    void (async () => {
       try {
         const r = await setSeriesFlag(series, flag, !current);
         if ("ok" in r) return;
@@ -160,7 +169,7 @@ export function SeriesTrackingProvider({
         set(current);
         setError(true);
       }
-    });
+    })();
   };
 
   const saveStars = async (stars: number | null) => {
@@ -329,8 +338,9 @@ export function TrackerControls() {
 /** Círculo de "assisti" de um episódio (ou link para entrar). Episódio não exibido não tem círculo. */
 export function EpisodeCheck({ season, episode, title }: { season: number; episode: number; title: string }) {
   const t = useTracking();
-  if (!t) return null;
   const ref = { season, episode };
+  // O TMDB pode ainda não contar como exibido um episódio que saiu hoje: sem círculo até contar.
+  if (!t || !canMark(t.shape, ref, true)) return null;
   const on = t.watched.has(episodeKey(ref));
   const label = `Assisti: E${episode} · ${title}`;
   const className = `relative grid size-8 shrink-0 place-items-center rounded-full border-2 text-sm font-bold transition-colors after:absolute after:-inset-1.5 after:content-[''] ${
@@ -360,7 +370,9 @@ export function EpisodeCheck({ season, episode, title }: { season: number; episo
 export function MarkSeasonButton({ season, aired }: { season: number; aired: number[] }) {
   const t = useTracking();
   if (!t) return null;
-  const missing = aired.filter((episode) => !t.watched.has(episodeKey({ season, episode })));
+  const missing = aired.filter(
+    (episode) => canMark(t.shape, { season, episode }, true) && !t.watched.has(episodeKey({ season, episode })),
+  );
   if (missing.length === 0) return null;
   const className = "w-fit text-sm font-semibold text-accent hover:underline";
   if (!t.loggedIn) {

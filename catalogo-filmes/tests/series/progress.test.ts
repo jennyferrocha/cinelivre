@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  adoptServerState,
   airedEpisodes,
+  canMark,
   episodeKey,
   previousUnwatched,
   progressLabel,
@@ -106,5 +108,29 @@ describe("progressLabel", () => {
 describe("episodeKey", () => {
   it("temporada:episódio", () => {
     expect(episodeKey(e(2, 6))).toBe("2:6");
+  });
+});
+
+describe("especial como último episódio exibido", () => {
+  it("não zera os episódios já exibidos", () => {
+    const withSpecial = { ...shape, lastAired: e(0, 4) };
+    expect(airedEpisodes(withSpecial)).toEqual([e(1, 1), e(1, 2), e(1, 3), e(2, 1), e(2, 2), e(2, 3)]);
+  });
+});
+
+describe("canMark", () => {
+  it("regular: só o que o servidor também aceita; especial: pela data do episódio", () => {
+    expect(canMark(shape, e(2, 2), true)).toBe(true);
+    expect(canMark(shape, e(2, 3), true)).toBe(false); // data diz que saiu hoje, o TMDB ainda não
+    expect(canMark(shape, e(0, 1), true)).toBe(true);
+    expect(canMark(shape, e(0, 1), false)).toBe(false);
+  });
+});
+
+describe("adoptServerState", () => {
+  it("só adota o estado do servidor quando nada está sendo salvo", () => {
+    expect(adoptServerState("a", "b", 0)).toBe(true);
+    expect(adoptServerState("a", "b", 1)).toBe(false);
+    expect(adoptServerState("a", "a", 0)).toBe(false);
   });
 });

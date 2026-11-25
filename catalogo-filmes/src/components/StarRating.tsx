@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState, useTransition } from "react";
+import { useRef, useState } from "react";
 import { StarIcon } from "@/components/Icons";
 import { runStarsChange } from "@/lib/stars-flow";
 
@@ -25,7 +25,6 @@ export function StarRating({
   const [value, setValue] = useState(initial);
   const [failed, setFailed] = useState(false);
   const busy = useRef({ value: false });
-  const [, startTransition] = useTransition();
 
   // A página pode mandar outra nota (ex.: depois de entrar na conta): ela passa a valer.
   const [seen, setSeen] = useState(initial);
@@ -36,14 +35,13 @@ export function StarRating({
 
   const onClick = (n: number) => {
     setFailed(false);
-    startTransition(() =>
-      runStarsChange(value, n, {
-        save,
-        set: setValue,
-        onError: () => (onError ? onError() : setFailed(true)),
-        busy: busy.current,
-      }),
-    );
+    // Fora de transição: a estrela muda na hora, sem esperar o servidor responder.
+    void runStarsChange(value, n, {
+      save,
+      set: setValue,
+      onError: () => (onError ? onError() : setFailed(true)),
+      busy: busy.current,
+    });
   };
 
   const star = (n: number) => {

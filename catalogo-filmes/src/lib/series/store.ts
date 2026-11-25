@@ -1,6 +1,7 @@
 import "server-only";
 import type { EpisodeRef } from "@/lib/series/progress";
 import type { SeriesSnapshot } from "@/lib/series/validate";
+import { fetchAllRows } from "@/lib/supabase/pages";
 import { createSupabaseServer } from "@/lib/supabase/server";
 
 // Leitura e escrita do acompanhamento de séries no Supabase. As regras de segurança (RLS)
@@ -56,13 +57,21 @@ export async function getSeriesMarks(userId: string): Promise<{ series: SeriesMa
   try {
     const supabase = await client();
     const [series, episodes] = await Promise.all([
-      supabase.from("series_marks").select(SERIES_COLUMNS).eq("user_id", userId),
-      supabase.from("episode_marks").select("series_id, season, episode, watched_at").eq("user_id", userId).limit(20000),
+      fetchAllRows<SeriesRow>((from, to) =>
+        supabase.from("series_marks").select(SERIES_COLUMNS).eq("user_id", userId).order("series_id").range(from, to),
+      ),
+      fetchAllRows<EpisodeRow>((from, to) =>
+        supabase
+          .from("episode_marks")
+          .select("series_id, season, episode, watched_at")
+          .eq("user_id", userId)
+          .order("series_id")
+          .order("season")
+          .order("episode")
+          .range(from, to),
+      ),
     ]);
-    return {
-      series: series.error || !series.data ? [] : (series.data as SeriesRow[]).map(toSeriesMark),
-      episodes: episodes.error || !episodes.data ? [] : (episodes.data as EpisodeRow[]).map(toEpisodeMark),
-    };
+    return { series: series.map(toSeriesMark), episodes: episodes.map(toEpisodeMark) };
   } catch {
     return { series: [], episodes: [] };
   }
@@ -77,12 +86,18 @@ export async function getSeriesTracking(
     const supabase = await client();
     const [series, episodes] = await Promise.all([
       supabase.from("series_marks").select(SERIES_COLUMNS).eq("user_id", userId).eq("series_id", seriesId).maybeSingle(),
-      supabase.from("episode_marks").select("season, episode").eq("user_id", userId).eq("series_id", seriesId),
+      fetchAllRows<EpisodeRef>((from, to) =>
+        supabase
+          .from("episode_marks")
+          .select("season, episode")
+          .eq("user_id", userId)
+          .eq("series_id", seriesId)
+          .order("season")
+          .order("episode")
+          .range(from, to),
+      ),
     ]);
-    return {
-      mark: series.data ? toSeriesMark(series.data as SeriesRow) : null,
-      episodes: (episodes.data as EpisodeRef[] | null) ?? [],
-    };
+    return { mark: series.data ? toSeriesMark(series.data as SeriesRow) : null, episodes };
   } catch {
     return { mark: null, episodes: [] };
   }
