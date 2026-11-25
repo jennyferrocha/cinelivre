@@ -48,7 +48,11 @@ describe(`páginas em ${base}`, () => {
   });
 
   it("séries: série que não existe mostra 'não encontrada'", async () => {
-    expect(await page("/serie/999999999")).toContain("não encontrada");
+    for (const path of ["/serie/999999999", "/serie/abc"]) {
+      const html = await page(path);
+      expect(html).toContain("Esta série não existe ou saiu do catálogo do TMDB.");
+      expect(html).toContain("Voltar para o início");
+    }
   });
 
   it("busca acha filmes e séries", async () => {

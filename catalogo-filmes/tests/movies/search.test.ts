@@ -108,4 +108,33 @@ describe("searchTitles (com TMDB simulado)", () => {
     expect(urls.some((u) => u.includes("/tv/5/watch/providers"))).toBe(true);
     expect(urls.some((u) => u.includes("/9/"))).toBe(false);
   });
+
+  it("se só a consulta da série falha, os filmes continuam aparecendo", async () => {
+    fetchMock.mockImplementation(async (url: string) => {
+      if (url.includes("/search/multi")) {
+        return json({
+          page: 1,
+          total_pages: 1,
+          total_results: 2,
+          results: [
+            item(1),
+            { media_type: "tv", id: 7, name: "Série", first_air_date: "", poster_path: null, backdrop_path: null, vote_average: 7, genre_ids: [], overview: "" },
+          ],
+        });
+      }
+      if (url.includes("/tv/7/watch/providers")) return new Response("{}", { status: 503 });
+      return json({ results: {} });
+    });
+    const r = await searchTitles("x", { services: ["netflix"], includeFree: false }, groups);
+    expect(r.map((c) => [c.kind ?? "movie", c.id])).toEqual([["movie", 1]]);
+  });
+
+  it("se tudo falha, o erro chega à página amigável", async () => {
+    fetchMock.mockImplementation(async (url: string) =>
+      url.includes("/search/multi")
+        ? json({ page: 1, total_pages: 1, total_results: 1, results: [item(1)] })
+        : new Response("{}", { status: 503 }),
+    );
+    await expect(searchTitles("x", { services: ["netflix"], includeFree: false }, groups)).rejects.toThrow();
+  });
 });

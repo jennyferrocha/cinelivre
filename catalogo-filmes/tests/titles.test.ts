@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cardHref, certificationLabel } from "@/lib/titles";
+import { cardHref, cardKey, certificationLabel } from "@/lib/titles";
 
 describe("cardHref", () => {
   it("filme vai para /filme, série para /serie", () => {
@@ -13,5 +13,12 @@ describe("certificationLabel", () => {
     expect(certificationLabel("L")).toBe("Livre");
     expect(certificationLabel("14")).toBe("14 anos");
     expect(certificationLabel("TV-MA")).toBe("TV-MA");
+  });
+});
+
+describe("cardKey", () => {
+  it("filme e série com o mesmo id têm chaves diferentes", () => {
+    expect(cardKey({ id: 5 })).toBe("movie:5");
+    expect(cardKey({ id: 5, kind: "tv" })).toBe("tv:5");
   });
 });

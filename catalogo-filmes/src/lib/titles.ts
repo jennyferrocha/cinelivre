@@ -14,3 +14,8 @@ export function certificationLabel(cert: string): string {
 export function parseId(raw: string): number | null {
   return /^\d{1,10}$/.test(raw) && Number(raw) > 0 ? Number(raw) : null;
 }
+
+/** Chave única na tela: filme e série podem ter o mesmo id no TMDB. */
+export function cardKey(card: { id: number; kind?: "tv" }): string {
+  return `${card.kind ?? "movie"}:${card.id}`;
+}

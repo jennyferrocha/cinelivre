@@ -1,6 +1,7 @@
 import { MovieCard } from "@/components/MovieCard";
 import { RowScroller } from "@/components/RowScroller";
 import type { MovieCard as MovieCardData } from "@/lib/movies/discover";
+import { cardKey } from "@/lib/titles";
 
 const titleClass = "px-4 font-display text-lg font-semibold sm:px-10 sm:text-xl";
 
@@ -12,7 +13,7 @@ export function MovieRow({ title, movies }: { title: string; movies: MovieCardDa
       <h2 className={titleClass}>{title}</h2>
       <RowScroller label={title}>
         {movies.map((movie) => (
-          <MovieCard key={movie.id} movie={movie} className="w-32 shrink-0 snap-start sm:w-44" />
+          <MovieCard key={cardKey(movie)} movie={movie} className="w-32 shrink-0 snap-start sm:w-44" />
         ))}
       </RowScroller>
     </section>
@@ -29,7 +30,7 @@ export function RankedRow({ title, movies }: { title: string; movies: MovieCardD
       <RowScroller label={title}>
         <ol className="flex gap-4 sm:gap-5">
           {top.map((movie, i) => (
-            <li key={movie.id} className="relative flex shrink-0 snap-start items-end">
+            <li key={cardKey(movie)} className="relative flex shrink-0 snap-start items-end">
               <span
                 aria-hidden
                 className="rank-numeral -mr-3 mb-11 translate-y-[0.06em] font-display text-[6rem] leading-[0.8] font-extrabold tracking-tighter select-none sm:-mr-4 sm:text-[8rem]"
