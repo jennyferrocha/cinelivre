@@ -21,7 +21,7 @@ export function Header() {
             type="search"
             name="q"
             placeholder="Buscar filme"
-            aria-label="Buscar filme"
+            aria-label="Buscar filme ou série"
             className="w-24 min-w-0 bg-transparent pl-4 text-sm outline-none placeholder:text-foreground/70 min-[400px]:w-36 sm:w-52 [&::-webkit-search-cancel-button]:hidden"
           />
           <button
