@@ -83,4 +83,44 @@ suite("regras de segurança (RLS)", () => {
     const { data } = await newClient().from("movie_marks").select("*");
     expect(data ?? []).toEqual([]);
   });
+
+  describe("séries e estrelas", () => {
+    const series = (userId: string) => ({ user_id: userId, series_id: 1399, want: true, title: "Game of Thrones", year: "2011" });
+    const episode = (userId: string) => ({ user_id: userId, series_id: 1399, season: 1, episode: 1 });
+
+    beforeAll(async () => {
+      expect((await a.client.from("series_marks").insert(series(a.id))).error).toBeNull();
+      expect((await a.client.from("episode_marks").insert(episode(a.id))).error).toBeNull();
+    });
+
+    afterAll(async () => {
+      await a?.client.from("episode_marks").delete().eq("user_id", a.id);
+      await a?.client.from("series_marks").delete().eq("user_id", a.id);
+    });
+
+    it("a dona lê os próprios episódios e séries e dá estrelas a filmes", async () => {
+      expect((await a.client.from("episode_marks").select("season, episode").eq("user_id", a.id)).data).toEqual([
+        { season: 1, episode: 1 },
+      ]);
+      expect((await a.client.from("series_marks").select("series_id").eq("user_id", a.id)).data).toEqual([{ series_id: 1399 }]);
+      const stars = await a.client.from("movie_marks").update({ stars: 4 }).eq("user_id", a.id).select("stars");
+      expect(stars.data).toEqual([{ stars: 4 }]);
+    });
+
+    it("estrelas fora de 1 a 5 são recusadas pelo banco", async () => {
+      expect((await a.client.from("movie_marks").update({ stars: 6 }).eq("user_id", a.id)).error).not.toBeNull();
+      expect((await a.client.from("series_marks").update({ stars: 0 }).eq("user_id", a.id)).error).not.toBeNull();
+    });
+
+    it("outra conta não lê, não altera, não apaga e não cria", async () => {
+      for (const table of ["episode_marks", "series_marks"]) {
+        expect((await b.client.from(table).select("*").eq("user_id", a.id)).data).toEqual([]);
+        expect((await b.client.from(table).delete().eq("user_id", a.id).select()).data ?? []).toEqual([]);
+      }
+      expect((await b.client.from("series_marks").update({ want: false }).eq("user_id", a.id).select()).data ?? []).toEqual([]);
+      expect((await b.client.from("episode_marks").insert({ ...episode(a.id), episode: 2 })).error).not.toBeNull();
+      expect((await b.client.from("series_marks").insert({ ...series(a.id), series_id: 1 })).error).not.toBeNull();
+      expect((await a.client.from("episode_marks").select("episode").eq("user_id", a.id)).data).toEqual([{ episode: 1 }]);
+    });
+  });
 });

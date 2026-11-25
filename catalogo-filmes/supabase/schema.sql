@@ -54,3 +54,65 @@ create policy "settings: alterar as minhas" on public.user_settings
   for update to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
 create policy "settings: apagar as minhas" on public.user_settings
   for delete to authenticated using ((select auth.uid()) = user_id);
+
+-- ===== Séries (etapa 2). Pode rodar o arquivo inteiro de novo: nada é apagado. =====
+
+-- Nota pessoal (1 a 5 estrelas) dos filmes.
+alter table public.movie_marks add column if not exists stars smallint check (stars between 1 and 5);
+
+-- Episódios que cada pessoa marcou como assistidos (um registro por episódio).
+create table if not exists public.episode_marks (
+  user_id uuid not null references auth.users (id) on delete cascade,
+  series_id integer not null check (series_id > 0),
+  season integer not null check (season between 0 and 999),
+  episode integer not null check (episode between 1 and 9999),
+  watched_at timestamptz not null default now(),
+  primary key (user_id, series_id, season, episode)
+);
+
+create index if not exists episode_marks_user_series_idx on public.episode_marks (user_id, series_id);
+
+-- O que vale para a série inteira: "quero assistir", "parei de assistir", estrelas e os dados do pôster.
+-- A situação (acompanhando, já assisti...) não fica aqui: é calculada pelos episódios.
+create table if not exists public.series_marks (
+  user_id uuid not null references auth.users (id) on delete cascade,
+  series_id integer not null check (series_id > 0),
+  want boolean not null default false,
+  stopped boolean not null default false,
+  stars smallint check (stars between 1 and 5),
+  title text not null,
+  year text not null default '',
+  poster_path text,
+  rating numeric not null default 0,
+  updated_at timestamptz not null default now(),
+  primary key (user_id, series_id)
+);
+
+alter table public.episode_marks enable row level security;
+alter table public.series_marks enable row level security;
+
+drop policy if exists "episodes: ler os meus" on public.episode_marks;
+drop policy if exists "episodes: criar os meus" on public.episode_marks;
+drop policy if exists "episodes: alterar os meus" on public.episode_marks;
+drop policy if exists "episodes: apagar os meus" on public.episode_marks;
+create policy "episodes: ler os meus" on public.episode_marks
+  for select to authenticated using ((select auth.uid()) = user_id);
+create policy "episodes: criar os meus" on public.episode_marks
+  for insert to authenticated with check ((select auth.uid()) = user_id);
+create policy "episodes: alterar os meus" on public.episode_marks
+  for update to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
+create policy "episodes: apagar os meus" on public.episode_marks
+  for delete to authenticated using ((select auth.uid()) = user_id);
+
+drop policy if exists "series: ler as minhas" on public.series_marks;
+drop policy if exists "series: criar as minhas" on public.series_marks;
+drop policy if exists "series: alterar as minhas" on public.series_marks;
+drop policy if exists "series: apagar as minhas" on public.series_marks;
+create policy "series: ler as minhas" on public.series_marks
+  for select to authenticated using ((select auth.uid()) = user_id);
+create policy "series: criar as minhas" on public.series_marks
+  for insert to authenticated with check ((select auth.uid()) = user_id);
+create policy "series: alterar as minhas" on public.series_marks
+  for update to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
+create policy "series: apagar as minhas" on public.series_marks
+  for delete to authenticated using ((select auth.uid()) = user_id);
