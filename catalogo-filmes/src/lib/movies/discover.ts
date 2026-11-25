@@ -30,6 +30,8 @@ export type MovieCard = {
   services: ServiceLabel[];
   /** "tv" = série; ausente = filme. */
   kind?: "tv";
+  /** Estrelas que a pessoa deu (1 a 5), nas abas das listas. */
+  stars?: number | null;
 };
 
 const MAX_PARALLEL = 10;

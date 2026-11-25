@@ -10,6 +10,7 @@ const m = (movieId: number, status: MarkStatus, markedAt = "2026-01-01T00:00:00Z
   year: "2020",
   posterPath: "/p.jpg",
   rating: 7,
+  stars: null,
 });
 
 describe("nextStatus", () => {

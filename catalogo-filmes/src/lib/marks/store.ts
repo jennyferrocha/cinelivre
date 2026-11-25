@@ -13,6 +13,7 @@ type Row = {
   poster_path: string | null;
   rating: number;
   marked_at: string;
+  stars: number | null;
 };
 
 async function client() {
@@ -27,7 +28,7 @@ export async function getMarks(userId: string): Promise<Mark[]> {
     const supabase = await client();
     const { data, error } = await supabase
       .from("movie_marks")
-      .select("movie_id, status, title, year, poster_path, rating, marked_at")
+      .select("movie_id, status, title, year, poster_path, rating, marked_at, stars")
       .eq("user_id", userId);
     if (error || !data) return [];
     return (data as Row[]).map((r) => ({
@@ -38,6 +39,7 @@ export async function getMarks(userId: string): Promise<Mark[]> {
       posterPath: r.poster_path,
       rating: Number(r.rating),
       markedAt: r.marked_at,
+      stars: r.stars ?? null,
     }));
   } catch {
     return [];
@@ -66,5 +68,29 @@ export async function saveMark(userId: string, movie: MarkSnapshot, status: Mark
 export async function deleteMark(userId: string, movieId: number): Promise<void> {
   const supabase = await client();
   const { error } = await supabase.from("movie_marks").delete().eq("user_id", userId).eq("movie_id", movieId);
+  if (error) throw new Error(error.message);
+}
+
+/** Grava as estrelas do filme junto com a lista (dar estrelas põe em "Já assisti"). */
+export async function saveMovieStars(
+  userId: string,
+  movie: MarkSnapshot,
+  status: MarkStatus,
+  stars: number | null,
+): Promise<void> {
+  const supabase = await client();
+  const { error } = await supabase.from("movie_marks").upsert(
+    {
+      user_id: userId,
+      movie_id: movie.movieId,
+      status,
+      stars,
+      title: movie.title,
+      year: movie.year,
+      poster_path: movie.posterPath,
+      rating: movie.rating,
+    },
+    { onConflict: "user_id,movie_id" },
+  );
   if (error) throw new Error(error.message);
 }

@@ -43,4 +43,12 @@ describe("parsePendingMark", () => {
     for (const bad of [undefined, "", "abc:quero", "603:outra", "603", "-1:quero", "1.5:quero", "0:quero", "603:quero:x"])
       expect(parsePendingMark(bad)).toBeNull();
   });
+
+  it("séries: 'quero assistir' e um episódio", () => {
+    expect(parsePendingMark("s1399:quero")).toEqual({ kind: "tv", seriesId: 1399, status: "quero" });
+    expect(parsePendingMark("s1399:t2e6")).toEqual({ kind: "tv", seriesId: 1399, episode: { season: 2, episode: 6 } });
+    expect(parsePendingMark("s1399:t0e1")).toEqual({ kind: "tv", seriesId: 1399, episode: { season: 0, episode: 1 } });
+    for (const bad of ["s0:quero", "s1:assisti", "s1:t2", "s1:t1000e1", "s1:t1e0", "sx:quero", "s1:t1e1:x"])
+      expect(parsePendingMark(bad)).toBeNull();
+  });
 });

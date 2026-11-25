@@ -6,13 +6,18 @@ export type MarkStatus = "quero" | "assisti";
 /** Dados do filme guardados junto com a marcação, para as abas abrirem sem consultar o TMDB. */
 export type MarkSnapshot = { movieId: number; title: string; year: string; posterPath: string | null; rating: number };
 
-export type Mark = MarkSnapshot & { status: MarkStatus; markedAt: string };
+export type Mark = MarkSnapshot & { status: MarkStatus; markedAt: string; stars: number | null };
 
 const POSTER_BASE = "https://image.tmdb.org/t/p/w342";
 
 /** Tocar num botão marca; tocar de novo desmarca; tocar no outro troca de lista. */
 export function nextStatus(current: MarkStatus | null, clicked: MarkStatus): MarkStatus | null {
   return current === clicked ? null : clicked;
+}
+
+/** Dar estrelas põe o filme em "Já assisti" (quem avalia, assistiu); apagar não tira da lista. */
+export function starsUpdate(current: MarkStatus | null, stars: number | null): MarkStatus | null {
+  return stars === null ? current : "assisti";
 }
 
 export function snapshotFromCard(card: MovieCard): MarkSnapshot {
@@ -40,5 +45,6 @@ export function marksToCards(marks: Mark[], status: MarkStatus): MovieCard[] {
       rating: m.rating,
       genreIds: [],
       services: [],
+      stars: m.stars,
     }));
 }
