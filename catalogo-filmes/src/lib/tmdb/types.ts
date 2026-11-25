@@ -81,3 +81,30 @@ export type TmdbMovieDetails = Omit<TmdbMovieListItem, "genre_ids"> & {
   release_dates?: TmdbReleaseDates;
   "watch/providers"?: TmdbWatchProvidersResponse;
 };
+
+/** /tv/{id} com append_to_response=videos,aggregate_credits,content_ratings,watch/providers */
+export type TmdbTvDetails = Omit<TmdbTvListItem, "genre_ids"> & {
+  last_air_date: string | null;
+  /** "Returning Series", "Ended", "Canceled", "In Production", "Planned"… */
+  status: string;
+  number_of_seasons: number;
+  genres: TmdbGenre[];
+  seasons: { season_number: number; name: string; episode_count: number }[];
+  videos?: { results: TmdbVideo[] };
+  aggregate_credits?: { cast: { name: string }[] };
+  content_ratings?: { results: { iso_3166_1: string; rating: string }[] };
+  "watch/providers"?: TmdbWatchProvidersResponse;
+};
+
+/** /tv/{id}/season/{n} */
+export type TmdbSeason = {
+  season_number: number;
+  episodes: {
+    episode_number: number;
+    name: string;
+    overview: string;
+    runtime: number | null;
+    air_date: string | null;
+    still_path: string | null;
+  }[];
+};

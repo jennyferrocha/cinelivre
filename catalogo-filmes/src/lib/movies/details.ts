@@ -4,7 +4,7 @@ import { availableServices } from "@/lib/providers/availability";
 import type { ServiceGroup } from "@/lib/providers/grouping";
 import type { Selection } from "@/lib/selection";
 import { imageUrl, tmdbFetch, TmdbError } from "@/lib/tmdb/client";
-import type { TmdbMovieDetails, TmdbProvider, TmdbReleaseDates, TmdbVideo } from "@/lib/tmdb/types";
+import type { TmdbMovieDetails, TmdbProvider, TmdbRegionOffers, TmdbReleaseDates, TmdbVideo } from "@/lib/tmdb/types";
 
 const DETAILS_REVALIDATE = 21600; // 6 horas
 const MAX_CAST = 6;
@@ -41,12 +41,12 @@ export function formatRuntime(minutes: number | null): string | null {
   return h === 0 ? `${m}min` : `${h}h${String(m).padStart(2, "0")}`;
 }
 
-function whereToWatch(
-  data: TmdbMovieDetails,
+/** Todos os streamings do Brasil com o título (assinatura, anúncios e grátis), os da pessoa marcados. */
+export function whereToWatch(
+  offers: TmdbRegionOffers | undefined,
   myKeys: Set<string>,
   groups: ServiceGroup[],
 ): WhereToWatch[] {
-  const offers = data["watch/providers"]?.results.BR;
   const providers: TmdbProvider[] = [...(offers?.flatrate ?? []), ...(offers?.ads ?? []), ...(offers?.free ?? [])];
   const seen = new Set<string>();
   const result: WhereToWatch[] = [];
@@ -117,6 +117,6 @@ export async function getMovieDetails(
     certification: brCertification(data.release_dates),
     trailerKey: pickTrailer(data.videos),
     cast: (data.credits?.cast ?? []).slice(0, MAX_CAST).map((c) => c.name),
-    allServicesBR: whereToWatch(data, new Set(services.map((s) => s.key)), groups),
+    allServicesBR: whereToWatch(data["watch/providers"]?.results.BR, new Set(services.map((s) => s.key)), groups),
   };
 }

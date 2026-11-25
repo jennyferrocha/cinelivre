@@ -16,11 +16,14 @@ export function pickLogo(logos: TmdbImage[]): TmdbImage | null {
   return null;
 }
 
-/** Arte oficial do título do filme, para o destaque. Sem arte (ou erro), volta null e o título vai em texto. */
-export async function getMovieLogo(movieId: number): Promise<MovieLogo | null> {
+/**
+ * Arte oficial do título do filme (ou da série, com `kind = "tv"`), para o destaque.
+ * Sem arte (ou erro), volta null e o título vai em texto.
+ */
+export async function getMovieLogo(movieId: number, kind?: "tv"): Promise<MovieLogo | null> {
   try {
     const data = await tmdbFetch<TmdbImagesResponse>(
-      `/movie/${movieId}/images`,
+      `/${kind === "tv" ? "tv" : "movie"}/${movieId}/images`,
       { include_image_language: "pt,en,null" },
       86400,
     );
